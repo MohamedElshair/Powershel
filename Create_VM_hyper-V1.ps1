@@ -115,10 +115,11 @@ Set-VMFirmware -VMName $VM_Name -EnableSecureBoot On  -BootOrder $vmDrive,$vmDVD
 
 ### Integration Services ###
 Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $VM_Name 
-### Network Apaptor ###
-
+### Network Apaptor for the project name ###
 Add-VMNetworkAdapter -VMName $VM_Name -SwitchName $Project_Name
 ###
+
+### Network Apaptor for the vm name ###
 Remove-VMNetworkAdapter -VMName $VM_Name
 Add-VMNetworkAdapter -VMName $VM_Name -SwitchName $VM_Name
 
@@ -126,5 +127,35 @@ Add-VMNetworkAdapter -VMName $VM_Name -SwitchName $VM_Name
 ## start VM's ###
 Get-VM -Name *$Project_Name* | Start-VM
 
+####### Get vm name and id to add in remote desktop ##############
+
+Get-VM | select Name,Id
 
 
+####### Add vm to remote desktop connection manager ##############
+Remove-Item -Path $Project_Path\$Project_Name.rdg -Force
+New-Item -Path $Project_Path -Name "$Project_Name.rdg" -ItemType File
+Get-ChildItem -Path $Project_Path -Name "$Project_Name.rdg" -File | ConvertTo-Xml
+
+Add-Content -Path $Project_Path\$Project_Name.rdg `
+-Value {<?xml version="1.0" encoding="utf-8"?>
+<RDCMan programVersion="2.90" schemaVersion="3">
+  <file>
+    <credentialsProfiles />
+    <properties>
+      <expanded>True</expanded>
+      <name>Itoutbreak</name>
+    </properties>
+    <server>
+      <properties>
+        <displayName>DC1</displayName>
+        <connectionType>VirtualMachineConsoleConnect</connectionType>
+        <vmId>e73707cd-f5c6-4979-bafe-3e398f7beab5</vmId>
+        <name>localhost</name>
+      </properties>
+    </server>
+  </file>
+  <connected />
+  <favorites />
+  <recentlyUsed />
+</RDCMan>}
