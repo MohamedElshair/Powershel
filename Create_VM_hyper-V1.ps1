@@ -158,7 +158,7 @@ Set-VMFirmware -VMName $VM_Full_Name -EnableSecureBoot On -BootOrder $vmDrive,$v
 ### Integration Services ###
 Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $VM_Full_Name
 ### Network Apaptor for the project name ###
-Add-VMNetworkAdapter -VMName $VM_Name -SwitchName $Project_Name
+Add-VMNetworkAdapter -VMName $VM_Full_Name -SwitchName $Project_Name
 ###
 
 ### Network Apaptor for the vm name ###
