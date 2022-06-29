@@ -86,5 +86,18 @@ $vmDrive= Get-VMHardDiskDrive -VMName $VM_Full_Name
 $vmNIC= Get-VMNetworkAdapter -VMName $VM_Full_Name
 Set-VMFirmware -VMName $VM_Full_Name -EnableSecureBoot On -BootOrder $vmDrive,$vmDVD,$vmNIC 
 
+
+### Attach ISO ###
+
+$ISO_folder = Read-Host "Please enter the iso file folder path"
+$ISO = Get-ChildItem $ISO_folder\*.iso
+Remove-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1
+Remove-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 1 -ControllerLocation 0
+
+Add-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -Path $ISO
+Set-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -Path $ISO
+Set-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 1 -Path $ISO
+
+
 ### Start VM ###
 Start-VM $VM_Full_Name
