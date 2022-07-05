@@ -1,14 +1,28 @@
-﻿Get-WindowsFeature *back* | select name
+﻿$Project_Name = "F2022"
+Get-VM $Project_Name*
+
+Enter-PSSession -VMName "F2022-DC1" -Credential (Get-Credential administrator)
+
+Get-WindowsFeature *back* | select name
 
 Add-WindowsFeature "AD-Domain-Services" -IncludeAllSubFeature -IncludeManagementTools
 Add-WindowsFeature "Windows-Server-Backup" -IncludeAllSubFeature -IncludeManagementTools
 
 
-Rename-Computer -NewName PDC -Restart -Force
+Rename-Computer -NewName DC1 -Restart -Force
+
+$DatabasePath = "c:\windows\NTDS"
+$LogPath = "c:\windows\NTDS"
+$SysvolPath = "c:\windows\SYSVOL"
+
+Install-ADDSForest -DomainName Itoutbreak.net -DomainNetbiosName Itoutbreak -ForestMode WinThreshold -DomainMode WinThreshold`
+ -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath
+
+
 
 
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "3"
+$InterfaceIndex = "5"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
