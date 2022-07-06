@@ -1,7 +1,23 @@
 ﻿$Project_Name = "F2022"
 Get-VM $Project_Name*
+Start-VM -VMName "F2022-DC1"
+
 
 Enter-PSSession -VMName "F2022-DC1" -Credential (Get-Credential administrator)
+
+
+Get-TimeZone *egy*
+
+Set-TimeZone -Id "Egypt Standard Time"
+
+Get-NetIPInterface  -AddressFamily IPv4
+$InterfaceIndex = "6"
+Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
+Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
+Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
+
+Set-DnsClientServerAddress -ServerAddresses 127.0.0.1 -InterfaceIndex $InterfaceIndex
 
 Get-WindowsFeature *back* | select name
 
@@ -21,13 +37,5 @@ Install-ADDSForest -DomainName Itoutbreak.net -DomainNetbiosName Itoutbreak -For
 
 
 
-Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "5"
-Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
-Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
-
-Set-DnsClientServerAddress -ServerAddresses 127.0.0.1 -InterfaceIndex $InterfaceIndex
 
 
