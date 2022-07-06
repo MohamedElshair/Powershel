@@ -1,10 +1,18 @@
-﻿$Project_Name = "F2022"
+﻿$Project_Name  = "F2022"
+$Net_BIOS_Name = "Itoutbreak"
+$Domain_Name   = "$Net_BIOS_Name" + "." + "net"
+$VM_Name       = "F2022-DC2"
+
+$DatabasePath = "c:\windows\NTDS"
+$LogPath = "c:\windows\NTDS"
+$SysvolPath = "c:\windows\SYSVOL"
+
 Get-VM $Project_Name*
-Start-VM -VMName "F2022-DC2"
+Start-VM -VMName $VM_Name
 
 
-Enter-PSSession -VMName "F2022-DC2" -Credential (Get-Credential administrator)
-Enter-PSSession -VMName "F2022-DC2" -Credential (Get-Credential itoutbreak\administrator)
+Enter-PSSession -VMName $VM_Name -Credential (Get-Credential administrator)
+Enter-PSSession -VMName $VM_Name -Credential (Get-Credential $Net_BIOS_Name\administrator)
 
 
 Get-TimeZone *egy*
@@ -28,14 +36,12 @@ Add-WindowsFeature "Windows-Server-Backup" -IncludeAllSubFeature -IncludeManagem
 
 Rename-Computer -NewName DC2 -Restart -Force
 
-$DatabasePath = "c:\windows\NTDS"
-$LogPath = "c:\windows\NTDS"
-$SysvolPath = "c:\windows\SYSVOL"
 
-Install-ADDSForest -DomainName Itoutbreak.net -DomainNetbiosName Itoutbreak -ForestMode WinThreshold -DomainMode WinThreshold `
+
+Install-ADDSForest -DomainName $Net_BIOS_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold `
 -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath
 
-Install-ADDSDomainController -DomainName Itoutbreak.local -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -InstallDns
+Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -InstallDns
 
 
 
