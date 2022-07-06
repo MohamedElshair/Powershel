@@ -31,8 +31,8 @@ $DatabasePath = "c:\windows\NTDS"
 $LogPath = "c:\windows\NTDS"
 $SysvolPath = "c:\windows\SYSVOL"
 
-Install-ADDSForest -DomainName Itoutbreak.net -DomainNetbiosName Itoutbreak -ForestMode WinThreshold -DomainMode WinThreshold`
- -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath
+Install-ADDSForest -DomainName Itoutbreak.net -DomainNetbiosName Itoutbreak -ForestMode WinThreshold -DomainMode WinThreshold `
+-InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath
 
 
 
