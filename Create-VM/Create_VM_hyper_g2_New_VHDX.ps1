@@ -38,7 +38,7 @@ Write-Host "We made a Project Folder on behalf of you to create your VM's inside
 explorer.exe $Project_Path}
 elseif ($Test_Project_Path.Equals($true)){
 Write-Host "We found that Project Folder is already created before, You can find it under this path $Project_Path"
-explorer.exe $Project_Path}
+}
 
 #################################################################################################################################
 
@@ -46,7 +46,7 @@ explorer.exe $Project_Path}
 $Test_VM_Path   = Test-Path -Path $VM_Path
 if ($Test_VM_Path.Equals($false)) {
 New-VM -Name "$VM_Full_Name" -Generation 2 -MemoryStartupBytes 2GB  -NoVHD -Path "$Project_Path" -SwitchName "$Project_Name"
-Set-VM -Name $VM_Full_Name -AutomaticCheckpointsEnabled 0 -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
+Set-VM -Name $VM_Full_Name -DynamicMemory -AutomaticCheckpointsEnabled 0 -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
 Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $VM_Full_Name
 }
 else 
@@ -71,6 +71,15 @@ Add-VMNetworkAdapter -VMName $VM_Full_Name -SwitchName External
 
 ### Enable TPM on VM ###
 Enable-VMTPM -VMName $VM_Full_Name
+
+### Attach ISO ###
+
+$ISO_folder = Read-Host "Please enter the iso file folder path"
+$ISO = Get-ChildItem $ISO_folder\*.iso
+Remove-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1
+Remove-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 1 -ControllerLocation 0
+Add-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -Path $ISO
+Set-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -Path $ISO
 
 
 ### Boot Order DVD first ###
