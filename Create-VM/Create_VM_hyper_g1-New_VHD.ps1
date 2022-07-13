@@ -1,5 +1,3 @@
-$global:VHD_Path = ("$Global:VM_Path" + "\" + "$Global:VM_Full_Name.vhd")
-
 ### Create VM G1 connected to switch name equal to same project name ###
 Clear-Host
 $Test_Project_Path   = Test-Path -Path $Global:Project_Path
