@@ -17,7 +17,8 @@ $Test_VM_Path   = Test-Path -Path $Global:VM_Path
 if ($Test_VM_Path.Equals($false))
 {
 New-VM -Name "$Global:VM_Full_Name" -Generation 1 -MemoryStartupBytes 2GB  -NoVHD -Path "$Global:VM_Path" -SwitchName "$Global:Project_Name"
-Set-VM -Name $Global:VM_Full_Name -AutomaticCheckpointsEnabled 0 -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
+Set-VM -Name $Global:VM_Full_Name -AutomaticCheckpointsEnabled 0 -CheckpointType Standard
+Set-VM -Name $Global:VM_Full_Name -DynamicMemory -MemoryMinimumBytes 1GB -MemoryMaximumBytes 2GB
 Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $Global:VM_Full_Name
 Disable-VMIntegrationService -Name "Time Synchronization" -VMName $Global:VM_Full_Name
 }
