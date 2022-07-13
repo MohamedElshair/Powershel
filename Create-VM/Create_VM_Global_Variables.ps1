@@ -54,13 +54,6 @@ if ($VM_Switches.Contains($Global:Project_Name))
 else 
 {New-VMSwitch "$Global:Project_Name" -SwitchType Private}
 
-####### Create legacy VM variables  ####### 
-
-
-
-
-
-
 ####### Print Project summary #######   
 Clear-Host
 Write-Host "         "
