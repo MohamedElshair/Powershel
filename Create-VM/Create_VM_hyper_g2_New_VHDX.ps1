@@ -1,7 +1,7 @@
 ﻿Clear-Host
 $Test_VM_Path   = Test-Path -Path $Global:VM_Path
 if ($Test_VM_Path.Equals($false)) {
-New-VM -Name "$Global:VM_Full_Name" -Generation 2 -MemoryStartupBytes 2GB  -NoVHD -Path "$Global:Project_Path" -SwitchName "$Project_Name"
+New-VM -Name "$Global:VM_Full_Name" -Generation 2 -MemoryStartupBytes 2GB  -NoVHD -Path "$Global:Project_Path" -SwitchName "$Global:Project_Name"
 Set-VM -Name $Global:VM_Full_Name -DynamicMemory -AutomaticCheckpointsEnabled 0 -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
 Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $Global:VM_Full_Name
 }
@@ -9,11 +9,11 @@ else
 {Write-Host "We found that your VM is already created before"}
 
 
-$Test_VHD_Path = Test-Path $VHD_Path
+$Test_VHD_Path = Test-Path $Global:VHDx_Path
 if ( $Test_VHD_Path.Equals($false))
 {
-New-VHD -Path "$VHD_Path" -SizeBytes (100GB) -Dynamic
-Add-VMHardDiskDrive -VMName $Global:VM_Full_Name -ControllerLocation 0 -ControllerNumber 0 -ControllerType SCSI -Path $VHD_Path
+New-VHD -Path "$Global:VHDx_Path" -SizeBytes (100GB) -Dynamic
+Add-VMHardDiskDrive -VMName $Global:VM_Full_Name -ControllerLocation 0 -ControllerNumber 0 -ControllerType SCSI -Path $Global:VHDx_Path
 Set-VM -Name $Global:VM_Full_Name -AutomaticCheckpointsEnabled 0 -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
 Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $Global:VM_Full_Name
 Disable-VMIntegrationService -Name "Time Synchronization" -VMName $Global:VM_Full_Name
