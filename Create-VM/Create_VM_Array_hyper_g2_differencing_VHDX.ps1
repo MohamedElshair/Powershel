@@ -48,7 +48,7 @@ Write-Host "We found that Project Folder is already created before, You can find
 $Test_VM_Path   = Test-Path -Path $VM_Path
 if ($Test_VM_Path.Equals($false))
 {
-New-VM -Name "$VM_Full_Name" -Generation 2 -MemoryStartupBytes 2GB  -NoVHD -Path "$Project_Path" -SwitchName "$Project_Name"
+New-VM -Name "$VM_Full_Name"  -Generation 2 -MemoryStartupBytes 2GB  -NoVHD -Path "$Project_Path" -SwitchName "$Project_Name"
 Set-VM -Name $VM_Full_Name -AutomaticCheckpointsEnabled 0 -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
 Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $VM_Full_Name
 }
