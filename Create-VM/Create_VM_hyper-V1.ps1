@@ -2,13 +2,27 @@ $global:VHD_Path = ("$Global:VM_Path" + "\" + "$Global:VM_Full_Name.vhd")
 
 ### Create VM G1 connected to switch name equal to same project name ###
 Clear-Host
-$Test_VM_Path   = Test-Path -Path $VM_Path
-if ($Test_VM_Path.Equals($false)) {New-VM -Name "$Global:VM_Full_Name" -Generation 1 -MemoryStartupBytes 2GB  -NoVHD -Path "$Global:Project_Path" -SwitchName "$Global:Project_Name"}
-else {Write-Host "We found that your VM is already created before"}
+$Test_Project_Path   = Test-Path -Path $Global:Project_Path
+if ($Test_Project_Path.Equals($false))
+{
+New-Item -ItemType Directory -Name $Global:Project_Name -Path $Global:Drive_Letter_collon
+Write-Host "We made a Project Folder on behalf of you to create your VM's inside it, You can find it under this path $Global:Project_Path"
+}
+elseif ($Test_Project_Path.Equals($true))
+{Write-Host "We found that Project Folder is already created before, You can find it under this path $Global:Project_Path"}
+
+
+Clear-Host
+$Test_VM_Path   = Test-Path -Path $Global:VM_Path
+if ($Test_VM_Path.Equals($false))
+{
+New-VM -Name "$Global:VM_Full_Name" -Generation 1 -MemoryStartupBytes 2GB  -NoVHD -Path "$Global:VM_Path" -SwitchName "$Global:Project_Name"
+Set-VM -Name $Global:VM_Full_Name -AutomaticCheckpointsEnabled 0 -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
 Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $Global:VM_Full_Name
 Disable-VMIntegrationService -Name "Time Synchronization" -VMName $Global:VM_Full_Name
-Add-VMNetworkAdapter -VMName $Global:VM_Full_Name -SwitchName $Global:Project_Name
-Set-VM -Name $Global:VM_Full_Name -AutomaticCheckpointsEnabled 0 -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
+}
+else {}
+
 
 #### Create new VHD for G1 ###
 Clear-Host
@@ -31,18 +45,6 @@ Remove-VMDvdDrive -VMName $Global:VM_Full_Name -ControllerNumber 1 -ControllerLo
 Add-VMDvdDrive -VMName $Global:VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -Path $ISO
 Set-VMDvdDrive -VMName $Global:VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -Path $ISO
 
-
-### Boot Order DVD first ###
-$vmDVD=Get-VMDvdDrive -VMName $Global:VM_Full_Name 
-$vmDrive= Get-VMHardDiskDrive -VMName $Global:VM_Full_Name 
-$vmNIC= Get-VMNetworkAdapter -VMName $Global:VM_Full_Name
-Set-VMFirmware -VMName $Global:VM_Full_Name -EnableSecureBoot On -BootOrder $vmDVD,$vmDrive,$vmNIC  
-
-### Boot Order VHD first ###
-$vmDVD=Get-VMDvdDrive -VMName $Global:VM_Full_Name
-$vmDrive= Get-VMHardDiskDrive -VMName $Global:VM_Full_Name  
-$vmNIC= Get-VMNetworkAdapter -VMName $Global:VM_Full_Name
-Set-VMFirmware -VMName $Global:VM_Full_Name -EnableSecureBoot On -BootOrder $vmDrive,$vmDVD,$vmNIC 
 
 
 ## start VM's ###
