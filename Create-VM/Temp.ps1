@@ -64,3 +64,6 @@ else {Write-Host "No thing to do"}
 ### Network Apaptor for the vm name ###
 Remove-VMNetworkAdapter -VMName $Global:VM_Name
 Add-VMNetworkAdapter -VMName $Global:VM_Name -SwitchName $Global:VM_Name
+
+
+Add-VMNetworkAdapter -VMName $Global:VM_Full_Name -SwitchName $Global:Project_Name
