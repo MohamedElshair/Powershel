@@ -1,7 +1,7 @@
 ﻿$Project_Name  = "F2022"
 $Net_BIOS_Name = "Itoutbreak"
 $Domain_Name   = "$Net_BIOS_Name" + "." + "net"
-$VM_Name       = "F2022-DC2"
+$VM_Name       = "F2022-DC1"
 
 $DatabasePath = "c:\windows\NTDS"
 $LogPath = "c:\windows\NTDS"
@@ -14,6 +14,8 @@ Start-VM -VMName $VM_Name
 Enter-PSSession -VMName $VM_Name -Credential (Get-Credential administrator)
 Enter-PSSession -VMName $VM_Name -Credential (Get-Credential $Net_BIOS_Name\administrator)
 
+
+Stop-Computer -Force
 
 Get-TimeZone *egy*
 
