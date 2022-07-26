@@ -1,7 +1,7 @@
-﻿$Project_Name  = "F2022"
+﻿$Project_Name  = "Itoutbreak"
 $Net_BIOS_Name = "Itoutbreak"
 $Domain_Name   = "$Net_BIOS_Name" + "." + "net"
-$VM_Name       = "F2022-DC1"
+$VM_Name       = "$Project_Name" + "-" + "DC1"
 
 $DatabasePath = "c:\windows\NTDS"
 $LogPath = "c:\windows\NTDS"
@@ -25,7 +25,7 @@ Get-NetIPInterface  -AddressFamily IPv4
 $InterfaceIndex = "6"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
 
 Set-DnsClientServerAddress -ServerAddresses 10.0.0.10 -InterfaceIndex $InterfaceIndex
@@ -36,11 +36,12 @@ Add-WindowsFeature "AD-Domain-Services" -IncludeAllSubFeature -IncludeManagement
 Add-WindowsFeature "Windows-Server-Backup" -IncludeAllSubFeature -IncludeManagementTools
 
 
-Rename-Computer -NewName DC2 -Restart -Force
+Rename-Computer -NewName DC1 -Restart -Force
+Restart-Computer -Force
 
 
 
-Install-ADDSForest -DomainName $Net_BIOS_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold `
+Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold `
 -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath
 
 Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -InstallDns
