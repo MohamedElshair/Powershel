@@ -1,7 +1,7 @@
-﻿$Project_Name  = "Itoutbreak"
+﻿$Project_Name  = $Project_Name
 $Net_BIOS_Name = "Itoutbreak"
 $Domain_Name   = "$Net_BIOS_Name" + "." + "net"
-$VM_Name       = "$Project_Name" + "-" + "DC2"
+$VM_Name       = "$Project_Name" + "-" + "DC3"
 
 $DatabasePath = "c:\windows\NTDS"
 $LogPath = "c:\windows\NTDS"
@@ -15,6 +15,10 @@ Enter-PSSession -VMName $VM_Name -Credential (Get-Credential administrator)
 Enter-PSSession -VMName $VM_Name -Credential (Get-Credential $Net_BIOS_Name\administrator)
 
 
+hostname
+
+Rename-Computer -NewName DC2 -Restart -Force
+
 Stop-Computer -Force
 
 Get-TimeZone *egy*
@@ -22,11 +26,11 @@ Get-TimeZone *egy*
 Set-TimeZone -Id "Egypt Standard Time"
 
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "6"
+$InterfaceIndex = "4"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
-Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
+Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
 Set-DnsClientServerAddress -ServerAddresses 10.0.0.10 -InterfaceIndex $InterfaceIndex
 
@@ -36,7 +40,7 @@ Add-WindowsFeature "AD-Domain-Services" -IncludeAllSubFeature -IncludeManagement
 Add-WindowsFeature "Windows-Server-Backup" -IncludeAllSubFeature -IncludeManagementTools
 
 hostname
-Rename-Computer -NewName DC2 -Restart -Force
+
 Restart-Computer -Force
 
 
