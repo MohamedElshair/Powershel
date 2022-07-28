@@ -49,3 +49,4 @@ Set-VMFirmware -VMName $VM_Full_Name -EnableSecureBoot On -BootOrder $vmDrive,$v
 
 ### Start VM ###
 Start-VM $VM_Full_Name
+
