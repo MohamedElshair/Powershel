@@ -63,6 +63,12 @@ $Content = @"
       <expanded>False</expanded>
      <name>$Project_Name</name>
     </properties>
+    <logonCredentials inherit="None">
+      <profileName scope="Local">Custom</profileName>
+      <userName>,\administrator</userName>
+      <password>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA3SS/P85+nUKGzZWMDzzLoAAAAAACAAAAAAAQZgAAAAEAACAAAAAboJ2wSQ8W32iMQcp6zwGDSkp/M8QjMNB2/el4/plkdwAAAAAOgAAAAAIAACAAAACBIM19nIqmtyuhx3wuAC8HTAUkOK4nvPRIEkXTmYS30SAAAABqnfhPA07IxCCap4kDhvu4tua/gZprhIlu4Cm2mxsHOEAAAACIRigefdbn77g3LGwK5EIqn/y3DYX1UpSXF91Fcpt0npJZgTUbC+z+ahxBzq2WokQPe77oUEYMOZO9rYrGh1fO</password>
+      <domain>,</domain>
+    </logonCredentials>
     $run
    </file>
    <connected />
