@@ -21,9 +21,9 @@ $FSMO     = netdom query fsmo
 Add-Content "$folderFullName\MainInfo.txt" $HostName," ",$FSMO
 
 $ReplSum = "Replsum" + ' ' + 'for' + ' ' + "$HostName"
-repadmin /replsum > "$folderFullName\$ReplSum.csv"
+repadmin /replsum > "$folderFullName\$ReplSum.txt"
 
-repadmin /showrepl * > "$folderFullName\ShowreplAll.csv"
+repadmin /showrepl * > "$folderFullName\ShowreplAll.txt"
 
 dcdiag.exe  /v  > "$folderFullName\DCDIAG.txt"
 
