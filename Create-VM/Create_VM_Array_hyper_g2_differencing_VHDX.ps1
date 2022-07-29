@@ -1,10 +1,11 @@
 ﻿################## Create Variables    #################################
-$VM_Name_Array = ("DC1","Router")
+$VM_Name_Array = ("DC1","DC2")
+
 
 foreach ( $VM_Name_Array in $VM_Name_Array ) 
 {
 
-$Project_Name = "F2022"
+$Project_Name = "F2012"
 
 $Drive_Letter_collon = "D:\"
 
@@ -57,7 +58,7 @@ Write-Host "We found that your VM is already created before"
 
 
 
-$ParentPath = "d:\Main Hard Drives\Win_Srv_2022 (updated June 2022).vhdx"
+$ParentPath = "d:\Main Hard Drives\MainWin2012R2Eval.vhdx"
 $Test_VHD_Path = Test-Path $VHD_Path
 $Test_ParentVHD_Path = Test-Path $ParentPath
 if ( $Test_ParentVHD_Path.Equals($false))
@@ -83,26 +84,6 @@ Set-VMFirmware -VMName $VM_Full_Name -EnableSecureBoot On -BootOrder $vmDrive,$v
 }
 
 
-
-
-### Boot Order DVD first ###
-$vmDVD=Get-VMDvdDrive -VMName $VM_Full_Name 
-$vmDrive= Get-VMHardDiskDrive -VMName $VM_Full_Name 
-$vmNIC= Get-VMNetworkAdapter -VMName $VM_Full_Name
-Set-VMFirmware -VMName $VM_Full_Name  -BootOrder $vmDVD,$vmDrive,$vmNIC  
-
-
-
-### Attach ISO ###
-
-$ISO_folder = Read-Host "Please enter the iso file folder path"
-$ISO = Get-ChildItem $ISO_folder\*.iso
-Remove-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1
-Remove-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 1 -ControllerLocation 0
-
-Add-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -Path $ISO
-Set-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -Path $ISO
-Set-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 1 -Path $ISO
 
 
 ### Start VM ###
