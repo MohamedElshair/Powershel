@@ -1,7 +1,9 @@
 ﻿$Project_Name  = $Project_Name
 $Net_BIOS_Name = "Itoutbreak"
 $Domain_Name   = "$Net_BIOS_Name" + "." + "net"
-$VM_Name       = "$Project_Name" + "-" + "DC3"
+$ComputerName   = "DC1"
+$VM_Name       = "$Project_Name" + "-" + "DC1"
+
 
 $DatabasePath = "c:\windows\NTDS"
 $LogPath = "c:\windows\NTDS"
@@ -17,7 +19,7 @@ Enter-PSSession -VMName $VM_Name -Credential (Get-Credential $Net_BIOS_Name\admi
 
 hostname
 
-Rename-Computer -NewName DC2 -Restart -Force
+Rename-Computer -NewName $ComputerName  -Restart -Force
 
 Stop-Computer -Force
 
