@@ -29,10 +29,10 @@ Get-TimeZone *egy*
 Set-TimeZone -Id "Egypt Standard Time"
 
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "6"
+$InterfaceIndex = "5"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
 Set-DnsClientServerAddress -ServerAddresses 10.0.0.10 -InterfaceIndex $InterfaceIndex
@@ -40,6 +40,8 @@ Set-DnsClientServerAddress -ServerAddresses 10.0.0.10 -InterfaceIndex $Interface
 Get-WindowsFeature *back* | select name
 
 Add-WindowsFeature "AD-Domain-Services" -IncludeAllSubFeature -IncludeManagementTools
+Remove-WindowsFeature "AD-Domain-Services" -IncludeManagementTools -Restart
+
 Add-WindowsFeature "Windows-Server-Backup" -IncludeAllSubFeature -IncludeManagementTools
 
 hostname
