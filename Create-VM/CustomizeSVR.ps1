@@ -1,8 +1,9 @@
-﻿$Project_Name  = $Project_Name
+﻿Clear-Host
+$Project_Name  = $Project_Name
 $Net_BIOS_Name = "Itoutbreak"
 $Domain_Name   = "$Net_BIOS_Name" + "." + "net"
-$ComputerName   = "DC1"
-$VM_Name       = "$Project_Name" + "-" + "DC1"
+$ComputerName   = "CA1"
+$VM_Name       = "$Project_Name" + "-" + $ComputerName
 
 
 $DatabasePath = "c:\windows\NTDS"
@@ -28,7 +29,7 @@ Get-TimeZone *egy*
 Set-TimeZone -Id "Egypt Standard Time"
 
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "4"
+$InterfaceIndex = "6"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
