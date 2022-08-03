@@ -15,3 +15,7 @@ RenewalValidityPeriodUnits=20
 
 AlternateSignatureAlgorithm=0
 
+
+### To define Active Directory Configuration Partition Distinguished Name
+Certutil -setreg CA\DSConfigDN "CN=Configuration,DC=Itoutbreak,DC=net"
+
