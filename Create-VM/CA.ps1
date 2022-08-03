@@ -69,3 +69,12 @@ RenewalValidityPeriodUnits=10
 LoadDefaultTemplates=0
 
 AlternateSignatureAlgorithm=0
+
+
+### Publish the Root CA Certificate and CRL
+certutil -f -dspublish "A:\CA01_Fabrikam Root CA.crt" RootCA
+certutil -f -dspublish "A:\Fabrikam Root CA.crl" CA01
+
+### To add  Root CA Certificate and CRL in local store
+certutil -addstore -f root "CA01_Itoutbreak Root CA.crt"
+certutil -addstore -f root "Itoutbreak Root CA.crl"
