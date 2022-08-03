@@ -78,3 +78,17 @@ certutil -f -dspublish "A:\Fabrikam Root CA.crl" CA01
 ### To add  Root CA Certificate and CRL in local store
 certutil -addstore -f root "CA01_Itoutbreak Root CA.crt"
 certutil -addstore -f root "Itoutbreak Root CA.crl"
+
+
+### Perform Post Installation Configuration Tasks on the Subordinate Issuing CA
+
+Certutil -setreg CA\CRLPeriodUnits 1
+Certutil -setreg CA\CRLPeriod "Weeks"
+Certutil -setreg CA\CRLDeltaPeriodUnits 1
+Certutil -setreg CA\CRLDeltaPeriod "Days"
+### Define CRL overlap settings by running the following command from an administrative command prompt:
+Certutil -setreg CA\CRLOverlapPeriodUnits 12
+Certutil -setreg CA\CRLOverlapPeriod "Hours"
+
+Certutil -setreg CA\ValidityPeriodUnits 5
+Certutil -setreg CA\ValidityPeriod "Years"
