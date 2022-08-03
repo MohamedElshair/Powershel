@@ -69,6 +69,19 @@ $Content = @"
       <password>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA3SS/P85+nUKGzZWMDzzLoAAAAAACAAAAAAAQZgAAAAEAACAAAAAboJ2wSQ8W32iMQcp6zwGDSkp/M8QjMNB2/el4/plkdwAAAAAOgAAAAAIAACAAAACBIM19nIqmtyuhx3wuAC8HTAUkOK4nvPRIEkXTmYS30SAAAABqnfhPA07IxCCap4kDhvu4tua/gZprhIlu4Cm2mxsHOEAAAACIRigefdbn77g3LGwK5EIqn/y3DYX1UpSXF91Fcpt0npJZgTUbC+z+ahxBzq2WokQPe77oUEYMOZO9rYrGh1fO</password>
       <domain>,</domain>
     </logonCredentials>
+    <remoteDesktop inherit="None">
+      <sameSizeAsClientArea>False</sameSizeAsClientArea>
+      <fullScreen>True</fullScreen>
+      <colorDepth>24</colorDepth>
+    </remoteDesktop>
+    <displaySettings inherit="None">
+      <liveThumbnailUpdates>True</liveThumbnailUpdates>
+      <allowThumbnailSessionInteraction>True</allowThumbnailSessionInteraction>
+      <showDisconnectedThumbnails>True</showDisconnectedThumbnails>
+      <thumbnailScale>1</thumbnailScale>
+      <smartSizeDockedWindows>True</smartSizeDockedWindows>
+      <smartSizeUndockedWindows>True</smartSizeUndockedWindows>
+    </displaySettings>
     $run
    </file>
    <connected />
