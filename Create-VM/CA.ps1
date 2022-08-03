@@ -41,3 +41,31 @@ certutil -getreg CA\CACertPublicationURLs
 certutil -setreg CA\CRLPublicationURLs "1:C:\Windows\system32\CertSrv\CertEnroll\%3%8%9.crl\n10:ldap:///CN=%7%8,CN=%2,CN=CDP,CN=Public Key Services,CN=Services,%6%10\n2:http://pki.Itoutbreak.net/CertEnroll/%3%8%9.crl"
 
 certutil -getreg CA\CRLPublicationURLs
+
+### Create CAPolicy.inf for Enterprise Root CA
+
+[Version]
+
+Signature="$Windows NT$"
+
+[PolicyStatementExtension]
+
+Policies=InternalPolicy
+
+[InternalPolicy]
+
+OID= 1.2.3.4.1455.67.89.5
+
+URL=http://pki.Itoutbreak.net/cps.txt
+
+[Certsrv_Server]
+
+RenewalKeyLength=2048
+
+RenewalValidityPeriod=Years
+
+RenewalValidityPeriodUnits=10
+
+LoadDefaultTemplates=0
+
+AlternateSignatureAlgorithm=0
