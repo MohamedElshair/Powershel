@@ -1,5 +1,4 @@
-﻿Clear-Host
-cd\
+﻿Clear-Host ; cd\
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
@@ -19,8 +18,7 @@ $SysvolPath               = 'c:\windows\SYSVOL'
 $StartRange               = '10.0.0.100' 
 $EndRange                 = '10.0.0.200'
 $DNS_Server               = '10.0.0.10'
-hostname
-whoami
+hostname ; whoami
 
 
 Get-VM $Project_Name*
@@ -78,7 +76,7 @@ Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagem
 #### DHCP ####
 Add-WindowsFeature 'DHCP'                  -IncludeAllSubFeature -IncludeManagementTools
 
-Add-DhcpServerv4Scope -StartRange $StartRange -EndRange $EndRange -Name 'Scope1' -State Active -Type Both -LeaseDuration 8 -SubnetMask '255.0.0.0'
+Add-DhcpServerv4Scope -StartRange $StartRange -EndRange $EndRange -Name 'Scope1' -State Active -Type Both  -SubnetMask '255.0.0.0' 
 
 Set-DhcpServerv4OptionValue -DnsServer $DNS_Server
 
