@@ -1,4 +1,4 @@
-﻿$ParentPath = Read-Host 'Please enter your main VHD path'
+﻿$ParentPath = Read-Host 'Please enter your main VHDX path'
 
 $Test_VM_Path   = Test-Path -Path $VM_Path
 if ($Test_VM_Path.Equals($false)) {
