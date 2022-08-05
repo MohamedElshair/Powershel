@@ -2,7 +2,7 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "DC1"
+$ComputerName             = "SUB"
 $VM_Name                  = "$Project_Name" + "-" + $ComputerName
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -51,16 +51,16 @@ Set-TimeZone -Id "Egypt Standard Time"
 ipconfig /release ; ipconfig /renew
 Get-NetIPAddress
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "4"
+$InterfaceIndex = "3"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
 Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
 
 ### List features ###
-Get-WindowsFeature *DHCP* | select name
+Get-WindowsFeature *ad* | select name
 Get-WindowsFeature | Where-Object InstallState -EQ installed
 
 
@@ -71,6 +71,8 @@ Add-WindowsFeature 'AD-Certificate'        -IncludeAllSubFeature -IncludeManagem
 
 Add-WindowsFeature 'ADCS-Cert-Authority'   -IncludeAllSubFeature -IncludeManagementTools
 
+Add-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment'   -IncludeAllSubFeature -IncludeManagementTools
+
 Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagementTools
 
 #### DHCP ####
@@ -80,7 +82,9 @@ Add-DhcpServerv4Scope -StartRange $StartRange -EndRange $EndRange -Name 'Scope1'
 
 Set-DhcpServerv4OptionValue -DnsServer $DNS_Server
 
-Add-DhcpServerInDC -DnsName $ComputerName
+Add-DhcpServerInDC  -DnsName $ComputerName -Confirm
+
+
 
 ### Remove Roles ###
 Remove-WindowsFeature 'AD-Domain-Services' -IncludeManagementTools -Restart
