@@ -40,8 +40,6 @@ certutil -setreg CA\CRLPublicationURLs "1:C:\Windows\system32\CertSrv\CertEnroll
 certutil -getreg CA\CRLPublicationURLs
 
 
-
-
 ### To define CRL Period Units and CRL Period
 Certutil -setreg CA\CRLPeriodUnits 52
 Certutil -setreg CA\CRLPeriod "Weeks"
@@ -80,7 +78,7 @@ AlternateSignatureAlgorithm=0
 
 ### Publish the Root CA Certificate and CRL
 certutil -f -dspublish "A:\CA01_Fabrikam Root CA.crt" RootCA
-certutil -f -dspublish "A:\Fabrikam Root CA.crl" CA01
+certutil -f -dspublish "A:\Fabrikam Root CA.crl" RootCA
 
 ### To add  Root CA Certificate and CRL in local store
 certutil -addstore -f root "CA01_Itoutbreak Root CA.crt"
