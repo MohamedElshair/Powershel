@@ -10,6 +10,8 @@ $VM_Name       = "$Project_Name" + "-" + $ComputerName
 $DatabasePath = "c:\windows\NTDS"
 $LogPath = "c:\windows\NTDS"
 $SysvolPath = "c:\windows\SYSVOL"
+
+$Password = Read-Host -AsSecureString
 hostname
 
 
@@ -62,8 +64,8 @@ hostname
 Restart-Computer -Force
 
 
-
-Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath
+### Promote First Forest ###
+Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -Force
 
 Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -InstallDns -Credential (Get-Credential $Net_BIOS_Name\administrator)
 
