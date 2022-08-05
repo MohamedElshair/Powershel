@@ -1,21 +1,21 @@
 ﻿Clear-Host
 cd\
-$Project_Name    = $Project_Name
-$Net_BIOS_Name   = 'Itoutbreak'
-$Domain_Name     = "$Net_BIOS_Name" + "." + "net"
-$ComputerName    = "DC1"
-$VM_Name         = "$Project_Name" + "-" + $ComputerName
-$LocalUserName   = 'administrator'
-$DomainUserName  = "$Net_BIOS_Name\$LocalUserName"
-$Password        = ConvertTo-SecureString -String 'P@$$w0rd' -AsPlainText -Force
-$LocalCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $LocalUserName,$Password
-$DomainCredential= New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DomainUserName,$Password
+$Project_Name             = $Project_Name
+$Net_BIOS_Name            = 'Itoutbreak'
+$Domain_Name              = "$Net_BIOS_Name" + "." + "net"
+$ComputerName             = "CLT1"
+$VM_Name                  = "$Project_Name" + "-" + $ComputerName
+$LocalUserNameSRV         = '.\administrator'
+$LocalUserNameCLT         = '.\admin'
+$DomainUserName           = "$Net_BIOS_Name\$LocalUserName"
+$Password                 = ConvertTo-SecureString -String 'P@$$w0rd' -AsPlainText -Force
+$LocalCredentialServer    = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $LocalUserNameSRV,$Password
+$LocalCredentialClient    = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $LocalUserNameCLT,$Password
+$DomainCredential         = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DomainUserName,$Password
 
-$DatabasePath = "c:\windows\NTDS"
-$LogPath = "c:\windows\NTDS"
-$SysvolPath = "c:\windows\SYSVOL"
-
-
+$DatabasePath             = 'c:\windows\NTDS'
+$LogPath                  = 'c:\windows\NTDS'
+$SysvolPath               = 'c:\windows\SYSVOL'
 hostname
 
 
@@ -24,10 +24,12 @@ Start-VM -VMName $VM_Name
 
 
 
-### Logon to lachine ###
-Enter-PSSession -VMName "$VM_Name" -Credential "$LocalCredential" ; cd\ ; Clear ; hostname
+### Logon to lacal machine "Server" ###
+Enter-PSSession -VMName "$VM_Name" -Credential "$LocalUserNameSRV" ; cd\ ; Clear ; hostname ; whoami
+### Logon to lacal machine "Client" ###
+Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialClient ; cd\ ; Clear ; hostname ; whoami
 ### Logon to domain joined machine ###
-Enter-PSSession -VMName "$VM_Name" -Credential "$DomainCredential" ; cd\ ; Clear ; hostname
+Enter-PSSession -VMName "$VM_Name" -Credential "$DomainCredential" ; cd\ ; Clear ; hostname ; whoami
 
 
 
