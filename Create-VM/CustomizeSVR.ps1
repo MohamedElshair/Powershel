@@ -2,7 +2,7 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "CLT1"
+$ComputerName             = "DC1"
 $VM_Name                  = "$Project_Name" + "-" + $ComputerName
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -27,7 +27,7 @@ Start-VM -VMName $VM_Name
 
 
 ### Logon to local machine "Server" ###
-Enter-PSSession -VMName "$VM_Name" -Credential $LocalUserNameSRV
+Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialServer 
 ### Logon to local machine "Client" ###
 Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialClient
 ### Logon to domain joined machine ###
