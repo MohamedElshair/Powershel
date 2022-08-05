@@ -28,24 +28,26 @@ Certutil -setreg CA\CRLOverlapPeriod "Weeks"
 Certutil -setreg CA\ValidityPeriodUnits 10
 Certutil -setreg CA\ValidityPeriod "Years"
 
+
+### Configure the AIA ###
+certutil -setreg CA\CACertPublicationURLs "1:C:\Windows\system32\CertSrv\CertEnroll\%1_%3%4.crt\n2:ldap:///CN=%7,CN=AIA,CN=Public Key Services,CN=Services,%6%11\n2:http://pki.Itoutbreak.net/CertEnroll/%1_%3%4.crt"
+
+certutil -getreg CA\CACertPublicationURLs
+
+### Configure the CDP ###
+certutil -setreg CA\CRLPublicationURLs "1:C:\Windows\system32\CertSrv\CertEnroll\%3%8%9.crl\n10:ldap:///CN=%7%8,CN=%2,CN=CDP,CN=Public Key Services,CN=Services,%6%10\n2:http://pki.Itoutbreak.net/CertEnroll/%3%8%9.crl"
+
+certutil -getreg CA\CRLPublicationURLs
+
+
+
+
 ### To define CRL Period Units and CRL Period
 Certutil -setreg CA\CRLPeriodUnits 52
 Certutil -setreg CA\CRLPeriod "Weeks"
 Certutil -setreg CA\CRLDeltaPeriodUnits 0
 
 
-
-
-
-### Configure the AIA
-certutil -setreg CA\CACertPublicationURLs "1:C:\Windows\system32\CertSrv\CertEnroll\%1_%3%4.crt\n2:ldap:///CN=%7,CN=AIA,CN=Public Key Services,CN=Services,%6%11\n2:http://pki.Itoutbreak.net/CertEnroll/%1_%3%4.crt"
-
-certutil -getreg CA\CACertPublicationURLs
-
-### Configure the CDP
-certutil -setreg CA\CRLPublicationURLs "1:C:\Windows\system32\CertSrv\CertEnroll\%3%8%9.crl\n10:ldap:///CN=%7%8,CN=%2,CN=CDP,CN=Public Key Services,CN=Services,%6%10\n2:http://pki.Itoutbreak.net/CertEnroll/%3%8%9.crl"
-
-certutil -getreg CA\CRLPublicationURLs
 
 ### Create CAPolicy.inf for Enterprise Root CA
 
