@@ -3,7 +3,7 @@ cd\
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "DC1"
+$ComputerName             = "CLT1"
 $VM_Name                  = "$Project_Name" + "-" + $ComputerName
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -16,6 +16,9 @@ $DomainCredential         = New-Object -TypeName System.Management.Automation.PS
 $DatabasePath             = 'c:\windows\NTDS'
 $LogPath                  = 'c:\windows\NTDS'
 $SysvolPath               = 'c:\windows\SYSVOL'
+$StartRange               = '10.0.0.100' 
+$EndRange                 = '10.0.0.200'
+$DNS_Server               = '10.0.0.10'
 hostname
 whoami
 
@@ -26,12 +29,14 @@ Start-VM -VMName $VM_Name
 
 
 ### Logon to local machine "Server" ###
-Enter-PSSession -VMName "$VM_Name" -Credential $LocalUserNameSRV ; cd\ ; Clear ; hostname ; whoami
+Enter-PSSession -VMName "$VM_Name" -Credential $LocalUserNameSRV
 ### Logon to local machine "Client" ###
-Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialClient ; cd\ ; Clear ; hostname ; whoami
+Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialClient
 ### Logon to domain joined machine ###
-Enter-PSSession -VMName "$VM_Name" -Credential $DomainCredential ; cd\ ; Clear ; hostname ; whoami
+Enter-PSSession -VMName "$VM_Name" -Credential $DomainCredential
 
+
+cd\ ; Clear ; hostname ; whoami
 
 
 
@@ -45,6 +50,7 @@ Get-TimeZone *egy*
 
 Set-TimeZone -Id "Egypt Standard Time"
 
+ipconfig /release ; ipconfig /renew
 Get-NetIPAddress
 Get-NetIPInterface  -AddressFamily IPv4
 $InterfaceIndex = "4"
@@ -53,7 +59,7 @@ Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
-Set-DnsClientServerAddress -ServerAddresses 10.0.0.10 -InterfaceIndex $InterfaceIndex
+Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
 
 ### List features ###
 Get-WindowsFeature *DHCP* | select name
@@ -69,7 +75,14 @@ Add-WindowsFeature 'ADCS-Cert-Authority'   -IncludeAllSubFeature -IncludeManagem
 
 Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagementTools
 
+#### DHCP ####
 Add-WindowsFeature 'DHCP'                  -IncludeAllSubFeature -IncludeManagementTools
+
+Add-DhcpServerv4Scope -StartRange $StartRange -EndRange $EndRange -Name 'Scope1' -State Active -Type Both -LeaseDuration 8 -SubnetMask '255.0.0.0'
+
+Set-DhcpServerv4OptionValue -DnsServer $DNS_Server
+
+Add-DhcpServerInDC -DnsName $ComputerName
 
 ### Remove Roles ###
 Remove-WindowsFeature 'AD-Domain-Services' -IncludeManagementTools -Restart
