@@ -1,17 +1,21 @@
 ﻿Clear-Host
 cd\
-$Project_Name  = $Project_Name
-$Net_BIOS_Name = "Itoutbreak"
-$Domain_Name   = "$Net_BIOS_Name" + "." + "net"
-$ComputerName   = "DC1"
-$VM_Name       = "$Project_Name" + "-" + $ComputerName
-
+$Project_Name    = $Project_Name
+$Net_BIOS_Name   = 'Itoutbreak'
+$Domain_Name     = "$Net_BIOS_Name" + "." + "net"
+$ComputerName    = "DC1"
+$VM_Name         = "$Project_Name" + "-" + $ComputerName
+$LocalUserName   = 'administrator'
+$DomainUserName  = "$Net_BIOS_Name\$LocalUserName"
+$Password        = ConvertTo-SecureString -String 'P@$$w0rd' -AsPlainText -Force
+$LocalCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $LocalUserName,$Password
+$DomainCredential= New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DomainUserName,$Password
 
 $DatabasePath = "c:\windows\NTDS"
 $LogPath = "c:\windows\NTDS"
 $SysvolPath = "c:\windows\SYSVOL"
 
-$Password = Read-Host -AsSecureString
+
 hostname
 
 
@@ -19,8 +23,11 @@ Get-VM $Project_Name*
 Start-VM -VMName $VM_Name
 
 
-Enter-PSSession -VMName $VM_Name -Credential (Get-Credential administrator)
-Enter-PSSession -VMName $VM_Name -Credential (Get-Credential $Net_BIOS_Name\administrator)
+
+### Logon to lachine ###
+Enter-PSSession -VMName "$VM_Name" -Credential "$LocalCredential" ; cd\ ; Clear ; hostname
+### Logon to domain joined machine ###
+Enter-PSSession -VMName "$VM_Name" -Credential "$DomainCredential" ; cd\ ; Clear ; hostname
 
 
 
@@ -43,19 +50,22 @@ Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddre
 
 Set-DnsClientServerAddress -ServerAddresses 10.0.0.10 -InterfaceIndex $InterfaceIndex
 
-Get-WindowsFeature *ca* | select name
+### List features ###
+Get-WindowsFeature *ad* | select name
 Get-WindowsFeature | Where-Object InstallState -EQ installed
 
 
 ### Add Roles ###
-Add-WindowsFeature "AD-Domain-Services" -IncludeAllSubFeature -IncludeManagementTools
+Add-WindowsFeature 'AD-Domain-Services'    -IncludeAllSubFeature -IncludeManagementTools
 
-Add-WindowsFeature "AD-Certificate"  -IncludeAllSubFeature -IncludeManagementTools
+Add-WindowsFeature 'AD-Certificate'        -IncludeAllSubFeature -IncludeManagementTools
 
-Add-WindowsFeature "Windows-Server-Backup" -IncludeAllSubFeature -IncludeManagementTools
+Add-WindowsFeature 'ADCS-Cert-Authority'   -IncludeAllSubFeature -IncludeManagementTools
+
+Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagementTools
 
 ### Remove Roles ###
-Remove-WindowsFeature "AD-Domain-Services" -IncludeManagementTools -Restart
+Remove-WindowsFeature 'AD-Domain-Services' -IncludeManagementTools -Restart
 
 
 
