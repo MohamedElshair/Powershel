@@ -16,21 +16,26 @@ RenewalValidityPeriodUnits=20
 AlternateSignatureAlgorithm=0
 
 
-### To define Active Directory Configuration Partition Distinguished Name
+### To define Active Directory Configuration Partition Distinguished Name ###
 Certutil -setreg CA\DSConfigDN "CN=Configuration,DC=Itoutbreak,DC=net"
+Certutil -setreg CA\DSDomain "dc=itoutbreak,dc=net"
 
-### To define CRL Period Units and CRL Period, run the following commands from an administrative command prompt:
+### To define CRL Overlap Period Units and CRL Overlap Period ###
+Certutil -setreg CA\CRLOverlapPeriodUnits 3
+Certutil -setreg CA\CRLOverlapPeriod "Weeks"
+
+### To define Validity Period Units for all issued certificates by this CA ###
+Certutil -setreg CA\ValidityPeriodUnits 10
+Certutil -setreg CA\ValidityPeriod "Years"
+
+### To define CRL Period Units and CRL Period
 Certutil -setreg CA\CRLPeriodUnits 52
 Certutil -setreg CA\CRLPeriod "Weeks"
 Certutil -setreg CA\CRLDeltaPeriodUnits 0
 
-### To define CRL Overlap Period Units and CRL Overlap Period, run the following commands from an administrative command prompt:
-Certutil -setreg CA\CRLOverlapPeriodUnits 12
-Certutil -setreg CA\CRLOverlapPeriod "Hours"
 
-### To define Validity Period Units for all issued certificates by this CA, type following command and then press Enter. In this lab, the Enterprise Issuing CA should receive a 10 year lifetime for its CA certificate. To configure this, run the following commands from an administrative command prompt:
-Certutil -setreg CA\ValidityPeriodUnits 10
-Certutil -setreg CA\ValidityPeriod "Years"
+
+
 
 ### Configure the AIA
 certutil -setreg CA\CACertPublicationURLs "1:C:\Windows\system32\CertSrv\CertEnroll\%1_%3%4.crt\n2:ldap:///CN=%7,CN=AIA,CN=Public Key Services,CN=Services,%6%11\n2:http://pki.Itoutbreak.net/CertEnroll/%1_%3%4.crt"
