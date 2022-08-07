@@ -51,16 +51,16 @@ Set-TimeZone -Id "Egypt Standard Time"
 ipconfig /release ; ipconfig /renew
 Get-NetIPAddress
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "3"
+$InterfaceIndex = "6"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
 Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
 
 ### List features ###
-Get-WindowsFeature *ad* | select name
+Get-WindowsFeature *web* | select name
 Get-WindowsFeature | Where-Object InstallState -EQ installed
 
 
@@ -74,6 +74,10 @@ Add-WindowsFeature 'ADCS-Cert-Authority'   -IncludeAllSubFeature -IncludeManagem
 Add-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment'   -IncludeAllSubFeature -IncludeManagementTools
 
 Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagementTools
+
+Add-WindowsFeature 'Web-Server' -IncludeAllSubFeature -IncludeManagementTools
+
+
 
 #### DHCP ####
 Add-WindowsFeature 'DHCP'                  -IncludeAllSubFeature -IncludeManagementTools
