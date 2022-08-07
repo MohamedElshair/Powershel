@@ -1,19 +1,21 @@
 ﻿
 ### Create a CAPolicy.inf for the standalone offline root CA
 
-[Version]
-
-Signature="$Windows NT$"
-
+Version]
+Signature=”$Windows NT$”
+[PolicyStatementExtension]
+Policies=InternalPolicy
+[InternalPolicy]
+OID= 1.2.3.4.1455.67.89.5
 [Certsrv_Server]
-
-RenewalKeyLength=2048 ; recommended 4096
-
+RenewalKeyLength=4096
 RenewalValidityPeriod=Years
-
 RenewalValidityPeriodUnits=20
-
-AlternateSignatureAlgorithm=0
+CRLPeriod=Years
+CRLPeriodUnits=20
+CRLDeltaPeriod=Days
+CRLDeltaPeriodUnits=0
+LoadDefaultTemplates=0
 
 
 ### To define Active Directory Configuration Partition Distinguished Name ###
