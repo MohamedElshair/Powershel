@@ -1,7 +1,7 @@
 ﻿
 ### Create a CAPolicy.inf for the standalone offline root CA
 
-Version]
+[Version]
 Signature=”$Windows NT$”
 [PolicyStatementExtension]
 Policies=InternalPolicy
