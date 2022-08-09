@@ -2,7 +2,7 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "SUB"
+$ComputerName             = "SUBCA"
 $VM_Name                  = "$Project_Name" + "-" + $ComputerName
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -48,13 +48,16 @@ Get-TimeZone *egy*
 
 Set-TimeZone -Id "Egypt Standard Time"
 
+clear ; ipconfig /all
 ipconfig /release ; ipconfig /renew
 Get-NetIPAddress
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "6"
+$InterfaceIndex = "5"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
 Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
@@ -92,6 +95,8 @@ Add-DhcpServerInDC  -DnsName $ComputerName -Confirm
 
 ### Remove Roles ###
 Remove-WindowsFeature 'AD-Domain-Services' -IncludeManagementTools -Restart
+
+Remove-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment'   -IncludeAllSubFeature -IncludeManagementTools
 
 
 
