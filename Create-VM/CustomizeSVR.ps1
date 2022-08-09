@@ -40,7 +40,7 @@ cd\ ; Clear ; hostname ; whoami
 
 Rename-Computer -NewName $ComputerName  -Restart -Force
 
-Add-Computer -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
+Add-Computer -NewName $ComputerName -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
 
 Stop-Computer -Force
 
