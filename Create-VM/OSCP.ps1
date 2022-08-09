@@ -1,0 +1,1 @@
+﻿certutil -cainfo xchg
