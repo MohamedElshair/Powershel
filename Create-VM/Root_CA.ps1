@@ -1,6 +1,8 @@
 ﻿### Create a CAPolicy.inf for the standalone offline root CA
 
-[Version]
+New-Item -Path C:\Windows -Name CAPolicy.inf -ItemType File -Force
+
+$content={[Version]
 Signature=”$Windows NT$”
 [PolicyStatementExtension]
 Policies=InternalPolicy
@@ -14,8 +16,9 @@ CRLPeriod=Years
 CRLPeriodUnits=20
 CRLDeltaPeriod=Days
 CRLDeltaPeriodUnits=0
-LoadDefaultTemplates=0
+LoadDefaultTemplates=0}
 
+Add-Content -Value $content -Path C:\Windows\CAPolicy.inf
 
 ### To define Active Directory Configuration Partition Distinguished Name ###
 Certutil -setreg CA\DSConfigDN "CN=Configuration,DC=Itoutbreak,DC=net"
