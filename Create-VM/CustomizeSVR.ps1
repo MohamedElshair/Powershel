@@ -2,7 +2,7 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "SUBCA"
+$ComputerName             = "DC2"
 $VM_Name                  = "$Project_Name" + "-" + $ComputerName
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -52,7 +52,7 @@ clear ; ipconfig /all
 ipconfig /release ; ipconfig /renew
 Get-NetIPAddress
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "14"
+$InterfaceIndex = "3"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
@@ -108,7 +108,9 @@ Restart-Computer -Force
 ### Promote First Forest ###
 Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -Force
 
-Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -InstallDns -Credential (Get-Credential $Net_BIOS_Name\administrator)
+Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -InstallDns -Force -Credential $DomainCredential
+
+
 
 
 
