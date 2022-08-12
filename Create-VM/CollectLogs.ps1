@@ -1,36 +1,70 @@
-﻿c:
-cd\
-cls
+﻿$Testpath = Test-Path  'C:\CollectLogs.ps1'
+
+if ($Testpath -eq $true )
+{
+Remove-Item -Path C:\CollectLogs.ps1 -Force
+New-Item -Path C:\ -Name CollectLogs.ps1 -ItemType File -Force
+}
+else
+{
+New-Item -Path C:\ -Name CollectLogs.ps1 -ItemType File -Force
+}
+
+
+
+$content1={c: ; cd\ ;cls
+$HostName      = hostname
+$getadcomputer = Get-ADComputer $HostName | select name,ObjectGUID,sid
+$w32tm         = w32tm /query /status
 $Date = Get-Date -Format 'dd.MMMM.yy   HH.mm.ss'
 $folderFullName  = "MicrosoftLogs" + "   " + "$Date"
 New-Item "$folderFullName" -ItemType directory
-New-Item "$folderFullName\MainInfo.txt" -ItemType file
-New-Item "$folderFullName\DFS.txt" -ItemType file
+New-Item "$folderFullName\$HostName-MainInfo.txt" -ItemType file
+New-Item "$folderFullName\$HostName-DFS.txt" -ItemType file
+New-Item "$folderFullName\$HostName-LOGS" -ItemType Directory
+New-Item "$folderFullName\$HostName-Events" -ItemType Directory
+New-Item "$folderFullName\$HostName-Replication" -ItemType Directory
 
 Copy-Item 'C:\Windows\debug\*.log' $folderFullName
-Copy-Item 'C:\Windows\System32\Winevt\Logs\Application.evtx' $folderFullName
-Copy-Item 'C:\Windows\System32\Winevt\Logs\DFS Replication.evtx' $folderFullName
-Copy-Item 'C:\Windows\System32\Winevt\Logs\Directory Service.evtx' $folderFullName
-Copy-Item 'C:\Windows\System32\Winevt\Logs\DNS Server.evtx' $folderFullName
-Copy-Item 'C:\Windows\System32\Winevt\Logs\System.evtx' $folderFullName
 
-$HostName = hostname
+$Logfiles = ls "c:\$folderFullName\*.log" | Move-Item -Destination "c:\$folderFullName\$HostName-LOGS" -Force
+
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Application.evtx' $folderFullName
+Rename-Item "c:\$folderFullName\Application.evtx" "c:\$folderFullName\$HostName-Application.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\DFS Replication.evtx' $folderFullName
+Rename-Item "c:\$folderFullName\DFS Replication.evtx" "c:\$folderFullName\$HostName-DFS Replication.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Directory Service.evtx' $folderFullName
+Rename-Item "c:\$folderFullName\Directory Service.evtx" "c:\$folderFullName\$HostName-Directory Service.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\DNS Server.evtx' $folderFullName
+Rename-Item "c:\$folderFullName\DNS Server.evtx" "c:\$folderFullName\$HostName-DNS Server.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\System.evtx' $folderFullName
+Rename-Item "c:\$folderFullName\System.evtx" "c:\$folderFullName\$HostName-System.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Security.evtx' $folderFullName
+Rename-Item "c:\$folderFullName\Security.evtx" "c:\$folderFullName\$HostName-Security.evtx" -Force
+
+Move-Item "c:\$folderFullName\*.evtx" "$folderFullName\$HostName-Events" -Force
 
 
 $FSMO     = netdom query fsmo
-Add-Content "$folderFullName\MainInfo.txt" $HostName," ",$FSMO
+Add-Content "$folderFullName\MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$w32tm
 
 $ReplSum = "Replsum" + ' ' + 'for' + ' ' + "$HostName"
-repadmin /replsum > "$folderFullName\$ReplSum.txt"
+repadmin /replsum > "$folderFullName\$HostName-$ReplSum.txt"
+Move-Item "c:\$folderFullName\$HostName-$ReplSum.txt" "$folderFullName\$HostName-Replication"
 
-repadmin /showrepl * > "$folderFullName\ShowreplAll.txt"
+repadmin /showrepl * > "$folderFullName\$HostName-ShowreplAll.txt" 
+Move-Item "c:\$folderFullName\$HostName-ShowreplAll.txt" "$folderFullName\$HostName-Replication"
 
-dcdiag.exe  /v  > "$folderFullName\DCDIAG.txt"
+dcdiag.exe  /v  > "$folderFullName\$HostName-DCDIAG.txt"
 
 $DFSglobalstate      = dfsrmig.exe /getglobalstate
 $DFSmigrationstate   = dfsrmig.exe /getmigrationstate
-$DFSReplicationState = dfsrdiag.exe ReplicationState
+$DFSReplicationState = dfsrdiag.exe /ReplicationState
 
-Add-Content "$folderFullName\DFS.txt "$DFSglobalstate," ",$DFSmigrationstate," ",$DFSReplicationState
+Add-Content "c:\$folderFullName\$HostName-DFS.txt" "$DFSglobalstate"," ",$DFSmigrationstate," ","$DFSReplicationState"
+Move-Item "c:\$folderFullName\$HostName-DFS.txt" "$folderFullName\$HostName-Replication"
+}
+
+Add-Content -Value $content1 -Path C:\CollectLogs.ps1
 
 
