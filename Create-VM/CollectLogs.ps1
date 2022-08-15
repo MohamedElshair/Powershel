@@ -16,6 +16,8 @@ $content1={c: ; cd\ ;cls
 $HostName      = hostname
 $getadcomputer = Get-ADComputer $HostName | select name,ObjectGUID,sid
 $w32tm         = w32tm /query /status
+$whoamiupn     = whoami /upn
+$whoamiGroups  = whoami /Groups
 $Date = Get-Date -Format 'dd.MMMM.yy   HH.mm.ss'
 $folderFullName  = "MicrosoftLogs" + "   " + "$Date"
 New-Item "$folderFullName" -ItemType directory
@@ -29,24 +31,16 @@ Copy-Item 'C:\Windows\debug\*.log' $folderFullName
 
 $Logfiles = ls "c:\$folderFullName\*.log" | Move-Item -Destination "c:\$folderFullName\$HostName-LOGS" -Force
 
-Copy-Item 'C:\Windows\System32\Winevt\Logs\Application.evtx' $folderFullName
-Rename-Item "c:\$folderFullName\Application.evtx" "c:\$folderFullName\$HostName-Application.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\DFS Replication.evtx' $folderFullName
-Rename-Item "c:\$folderFullName\DFS Replication.evtx" "c:\$folderFullName\$HostName-DFS Replication.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\Directory Service.evtx' $folderFullName
-Rename-Item "c:\$folderFullName\Directory Service.evtx" "c:\$folderFullName\$HostName-Directory Service.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\DNS Server.evtx' $folderFullName
-Rename-Item "c:\$folderFullName\DNS Server.evtx" "c:\$folderFullName\$HostName-DNS Server.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\System.evtx' $folderFullName
-Rename-Item "c:\$folderFullName\System.evtx" "c:\$folderFullName\$HostName-System.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\Security.evtx' $folderFullName
-Rename-Item "c:\$folderFullName\Security.evtx" "c:\$folderFullName\$HostName-Security.evtx" -Force
-
-Move-Item "c:\$folderFullName\*.evtx" "$folderFullName\$HostName-Events" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Application.evtx' "c:\$folderFullName\$HostName-Events\$HostName-Application.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\DFS Replication.evtx' "c:\$folderFullName\$HostName-Events\$HostName-DFS Replication.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Directory Service.evtx' "c:\$folderFullName\$HostName-Events\$HostName-Directory Service.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\DNS Server.evtx' "c:\$folderFullName\$HostName-Events\$HostName-DNS Server.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\System.evtx' "c:\$folderFullName\$HostName-Events\$HostName-System.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Security.evtx' "c:\$folderFullName\$HostName-Events\$HostName-Security.evtx" -Force
 
 
 $FSMO     = netdom query fsmo
-Add-Content "$folderFullName\MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$w32tm
+Add-Content "$folderFullName\$HostName-MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$w32tm," ",$whoamiupn," ",$whoamiGroups
 
 $ReplSum = "Replsum" + ' ' + 'for' + ' ' + "$HostName"
 repadmin /replsum > "$folderFullName\$HostName-$ReplSum.txt"
