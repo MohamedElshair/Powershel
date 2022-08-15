@@ -25,68 +25,83 @@ New-Item -Path C:\ -Name CollectLogs.ps1 -ItemType File -Force
 
 
 
-$content1={c: ; cd\ ;cls
-$HostName      = hostname
-$getadcomputer = Get-ADComputer $HostName | select name,ObjectGUID,sid
-$w32tm         = w32tm /query /status
-$whoamiupn     = whoami /upn
-$whoamiGroups  = whoami /Groups
-$Date = Get-Date -Format 'dd.MMMM.yy   HH.mm.ss'
+$content1={
+
+### Create main folder ###
+c: ; cd\ ;cls
+$HostName        = hostname
+$getadcomputer   = Get-ADComputer $HostName | select name,ObjectGUID,sid
+$w32tm           = w32tm /query /status
+$whoamiupn       = whoami /upn
+$whoamiGroups    = whoami /Groups
+$Date            = Get-Date -Format 'dd.MMMM.yy   HH.mm.ss'
 $folderFullName  = "MicrosoftLogs" + "   " + "$Date"
-
-
 New-Item "$folderFullName" -ItemType directory
-New-Item "$folderFullName\$HostName-MainInfo.txt" -ItemType file
-New-Item "$folderFullName\$HostName-DFS.txt" -ItemType file
-New-Item "$folderFullName\$HostName-ComputerInfo.txt" -ItemType file
-New-Item "$folderFullName\$HostName-Services.txt" -ItemType file
-New-Item "$folderFullName\$HostName-LOGS" -ItemType Directory
-New-Item "$folderFullName\$HostName-Events" -ItemType Directory
-New-Item "$folderFullName\$HostName-Replication" -ItemType Directory
+cd $folderFullName
+### Create main folder ###
 
-Copy-Item 'C:\Windows\debug\*.log' $folderFullName
+### Create main folders & files ###
+New-Item "$HostName-MainInfo.txt" -ItemType file
+New-Item "$HostName-ComputerInfo.txt" -ItemType file
+New-Item "$HostName-Services.txt" -ItemType file
+New-Item "$HostName-LOGS" -ItemType Directory
+New-Item "$HostName-Events" -ItemType Directory
+New-Item "$HostName-Replication" -ItemType Directory
+New-Item "$HostName-Replication\$HostName-DFS.txt" -ItemType file
+New-Item "$HostName-Registery" -ItemType Directory
+### Create main folders & files ###
 
-$Logfiles = ls "c:\$folderFullName\*.log" | Move-Item -Destination "c:\$folderFullName\$HostName-LOGS" -Force
+### Copy log files ###
+Copy-Item 'C:\Windows\debug\*.log' "$HostName-LOGS"
+### Copy log files ###
 
-Copy-Item 'C:\Windows\System32\Winevt\Logs\Application.evtx' "c:\$folderFullName\$HostName-Events\$HostName-Application.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\DFS Replication.evtx' "c:\$folderFullName\$HostName-Events\$HostName-DFS Replication.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\Directory Service.evtx' "c:\$folderFullName\$HostName-Events\$HostName-Directory Service.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\DNS Server.evtx' "c:\$folderFullName\$HostName-Events\$HostName-DNS Server.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\System.evtx' "c:\$folderFullName\$HostName-Events\$HostName-System.evtx" -Force
-Copy-Item 'C:\Windows\System32\Winevt\Logs\Security.evtx' "c:\$folderFullName\$HostName-Events\$HostName-Security.evtx" -Force
+### Copy event viewrs files ###
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Application.evtx' "$HostName-Events\$HostName-Application.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\DFS Replication.evtx' "$HostName-Events\$HostName-DFS Replication.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Directory Service.evtx' "$HostName-Events\$HostName-Directory Service.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\DNS Server.evtx' "$HostName-Events\$HostName-DNS Server.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\System.evtx' "$HostName-Events\$HostName-System.evtx" -Force
+Copy-Item 'C:\Windows\System32\Winevt\Logs\Security.evtx' "$HostName-Events\$HostName-Security.evtx" -Force
+### Copy event viewrs files ###
 
-Get-ComputerInfo > c:\$folderFullName\$HostName-ComputerInfo.txt
 
+Get-ComputerInfo > $HostName-ComputerInfo.txt
+
+### Test services ###
 $NTDS=cmd.exe /c "sc query ntds"
 $netlogon=cmd.exe /c "sc query netlogon"
 $lanman=cmd.exe /c "sc query lanmanworkstation"
 $dns=cmd.exe /c "sc query dns"
 $rpc=cmd.exe /c "sc query rpcss"
-
-Add-Content "c:\$folderFullName\$HostName-Services.txt" $NTDS," " ,$netlogon," ",$lanman," ",$dns," ",$rpc
+Add-Content "$HostName-Services.txt" $NTDS," " ,$netlogon," ",$lanman," ",$dns," ",$rpc
+### Test services ###
 
 ### Registery values ###
-$Get-ItemProperty -Path  Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters\
-Get-ItemProperty -Path  Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters\
+cmd.exe /c "reg export HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters\  $HostName-Registery\$HostName-Netlogon.reg"
+cmd.exe /c "reg export HKLM\SYSTEM\CurrentControlSet\Services\NTDS\Parameters\  $HostName-Registery\$HostName-NTDS.reg" 
+### Registery values ###
 
-$FSMO     = netdom query fsmo
-Add-Content "$folderFullName\$HostName-MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$w32tm," ",$whoamiupn," ",$whoamiGroups
 
+### Replication ###
 $ReplSum = "Replsum" + ' ' + 'for' + ' ' + "$HostName"
-repadmin /replsum > "$folderFullName\$HostName-$ReplSum.txt"
-Move-Item "c:\$folderFullName\$HostName-$ReplSum.txt" "$folderFullName\$HostName-Replication"
+repadmin /replsum > "$HostName-$ReplSum.txt"
+Move-Item "c:\$folderFullName\$HostName-$ReplSum.txt" "$HostName-Replication"
+repadmin /showrepl * > "$HostName-Replication\$HostName-ShowreplAll.txt" 
+### Replication ###
 
-repadmin /showrepl * > "$folderFullName\$HostName-ShowreplAll.txt" 
-Move-Item "c:\$folderFullName\$HostName-ShowreplAll.txt" "$folderFullName\$HostName-Replication"
+### Domain function ###
+$FSMO     = netdom query fsmo
+dcdiag.exe  /v  > "$HostName-DCDIAG.txt"
+Add-Content "$HostName-MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$w32tm," ",$whoamiupn," ",$whoamiGroups
+### Domain function ###
 
-dcdiag.exe  /v  > "$folderFullName\$HostName-DCDIAG.txt"
-
+### DFS ###
 $DFSglobalstate      = dfsrmig.exe /getglobalstate
 $DFSmigrationstate   = dfsrmig.exe /getmigrationstate
-$DFSReplicationState = dfsrdiag.exe /ReplicationState
+Add-Content "$HostName-Replication\$HostName-DFS.txt" "$DFSglobalstate"," ",$DFSmigrationstate
+### DFS ###
 
-Add-Content "c:\$folderFullName\$HostName-DFS.txt" "$DFSglobalstate"," ",$DFSmigrationstate," ","$DFSReplicationState"
-Move-Item "c:\$folderFullName\$HostName-DFS.txt" "$folderFullName\$HostName-Replication"
+cd\
 
 }
 
