@@ -20,6 +20,19 @@ $whoamiupn     = whoami /upn
 $whoamiGroups  = whoami /Groups
 $Date = Get-Date -Format 'dd.MMMM.yy   HH.mm.ss'
 $folderFullName  = "MicrosoftLogs" + "   " + "$Date"
+
+
+$Ports = ("53","135","88","389")
+#53  --> DNS
+#135 --> RPC Locator
+#88  --> Kerberos
+#389 --> LDAP
+cls
+foreach ($Ports in $Ports)
+{
+Test-NetConnection "DC name" -Port $Ports
+}
+
 New-Item "$folderFullName" -ItemType directory
 New-Item "$folderFullName\$HostName-MainInfo.txt" -ItemType file
 New-Item "$folderFullName\$HostName-DFS.txt" -ItemType file
