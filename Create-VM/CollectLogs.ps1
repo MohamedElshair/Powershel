@@ -6,7 +6,7 @@
 cls
 foreach ($Ports in $Ports)
 {
-Test-NetConnection "DC name" -Port $Ports
+Test-NetConnection "WIN-BH74LPDB544" -Port $Ports
 }
 
 
@@ -91,8 +91,11 @@ repadmin /showrepl * > "$HostName-Replication\$HostName-ShowreplAll.txt"
 
 ### Domain function ###
 $FSMO     = netdom query fsmo
+$ADForest = Get-ADForest | select sites,rootdomain,forestmode
+$ADDomain = Get-ADDomain | select name,domainmode
 dcdiag.exe  /v  > "$HostName-DCDIAG.txt"
-Add-Content "$HostName-MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$w32tm," ",$whoamiupn," ",$whoamiGroups
+Add-Content "$HostName-MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$ADForest," ",$ADDomain," ",$w32tm," ",$whoamiupn," ",$whoamiGroups
+
 ### Domain function ###
 
 ### DFS ###
