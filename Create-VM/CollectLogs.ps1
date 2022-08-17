@@ -32,16 +32,16 @@ c: ; cd\ ;cls
 $HostName        = hostname
 $getadcomputer   = Get-ADComputer $HostName | select name,ObjectGUID,sid
 $w32tm           = w32tm /query /status
-$whoamiupn       = whoami /upn
-$whoamiGroups    = whoami /Groups
 $Date            = Get-Date -Format 'dd.MMMM.yy   HH.mm.ss'
 $folderFullName  = "MicrosoftLogs" + "   " + "$Date"
 New-Item "$folderFullName" -ItemType directory
 cd $folderFullName
 ### Create main folder ###
 
+
 ### Create main folders & files ###
 New-Item "$HostName-MainInfo.txt" -ItemType file
+New-Item "$HostName-UserTest.txt" -ItemType file
 New-Item "$HostName-ComputerInfo.txt" -ItemType file
 New-Item "$HostName-Services.txt" -ItemType file
 New-Item "$HostName-LOGS" -ItemType Directory
@@ -50,6 +50,13 @@ New-Item "$HostName-Replication" -ItemType Directory
 New-Item "$HostName-Replication\$HostName-DFS.txt" -ItemType file
 New-Item "$HostName-Registery" -ItemType Directory
 ### Create main folders & files ###
+
+### User test ###
+$whoami          = whoami
+$whoamiupn       = whoami /upn
+$whoamiall       = whoami /all
+Add-Content "$HostName-UserTest.txt" $whoami," ",$whoamiupn," ",$whoamiall
+### User test ###
 
 ### Copy log files ###
 Copy-Item 'C:\Windows\debug\*.log' "$HostName-LOGS"
@@ -94,8 +101,7 @@ $FSMO     = netdom query fsmo
 $ADForest = Get-ADForest | select sites,rootdomain,forestmode
 $ADDomain = Get-ADDomain | select name,domainmode
 dcdiag.exe  /v  > "$HostName-DCDIAG.txt"
-Add-Content "$HostName-MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$ADForest," ",$ADDomain," ",$w32tm," ",$whoamiupn," ",$whoamiGroups
-
+Add-Content "$HostName-MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$ADForest," ",$ADDomain," ",$w32tm
 ### Domain function ###
 
 ### DFS ###
