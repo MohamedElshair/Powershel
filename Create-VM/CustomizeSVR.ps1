@@ -86,9 +86,6 @@ Add-WindowsFeature 'Web-Server' -IncludeAllSubFeature -IncludeManagementTools
 cls ; Add-WindowsFeature 'Routing' -IncludeAllSubFeature -IncludeManagementTools
 
 
-
-
-
 #### DHCP ####
 Add-WindowsFeature 'DHCP'                  -IncludeAllSubFeature -IncludeManagementTools
 
@@ -106,6 +103,10 @@ Remove-WindowsFeature 'AD-Domain-Services' -IncludeManagementTools -Restart
 Remove-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment' -IncludeAllSubFeature -IncludeManagementTools
 
 cls ; Remove-WindowsFeature 'FS-DFS-Replication' -IncludeManagementTools -Restart
+
+cls ; Remove-WindowsFeature 'Web-Server'  -IncludeManagementTools -Restart
+
+cls ; Remove-WindowsFeature 'GPMC'  -IncludeManagementTools -Restart
 
 
 
