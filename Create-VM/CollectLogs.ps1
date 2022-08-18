@@ -78,9 +78,15 @@ Get-ComputerInfo > $HostName-ComputerInfo.txt
 $NTDS=cmd.exe /c "sc query ntds"
 $netlogon=cmd.exe /c "sc query netlogon"
 $lanman=cmd.exe /c "sc query lanmanworkstation"
+$LanmanServer=cmd.exe /c "sc query LanmanServer"
+$Bowser=cmd.exe /c "sc query Bowser"
+$MRxSmb20=cmd.exe /c "sc query MRxSmb20"
+$NSI=cmd.exe /c "sc query NSI"
 $dns=cmd.exe /c "sc query dns"
 $rpc=cmd.exe /c "sc query rpcss"
-Add-Content "$HostName-Services.txt" $NTDS," " ,$netlogon," ",$lanman," ",$dns," ",$rpc
+$SamSS=cmd.exe /c "sc query SamSS"
+$Srv2=cmd.exe /c "sc query Srv2"
+Add-Content "$HostName-Services.txt" $NTDS," " ,$netlogon," ",$lanman," ",$dns," ",$rpc," ",$Bowser," ",$MRxSmb20," ",$NSI," " ,$LanmanServer," ",$SamSS," ",$Srv2
 ### Test services ###
 
 ### Registery values ###
