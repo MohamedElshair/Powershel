@@ -65,7 +65,8 @@ Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddre
 Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
 
 ### List features ###
-cls ; Get-WindowsFeature *DFS*| Where-Object InstallState -EQ installed | select name
+cls ; Get-WindowsFeature | Where-Object InstallState -NE installed | select name
+cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed
 
 
@@ -81,6 +82,10 @@ Add-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment'   -IncludeAllSubF
 Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagementTools
 
 Add-WindowsFeature 'Web-Server' -IncludeAllSubFeature -IncludeManagementTools
+
+cls ; Add-WindowsFeature 'Routing' -IncludeAllSubFeature -IncludeManagementTools
+
+
 
 
 
