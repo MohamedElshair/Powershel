@@ -65,7 +65,7 @@ Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddre
 Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
 
 ### List features ###
-cls ; Get-WindowsFeature | Where-Object InstallState -NE installed | select name
+cls ; Get-WindowsFeature *remote* | Where-Object InstallState -NE installed | select Name
 cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed
 
@@ -83,7 +83,9 @@ Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagem
 
 Add-WindowsFeature 'Web-Server' -IncludeAllSubFeature -IncludeManagementTools
 
-cls ; Add-WindowsFeature 'Routing' -IncludeAllSubFeature -IncludeManagementTools
+cls ; Add-WindowsFeature 'RemoteAccess' -IncludeAllSubFeature -IncludeManagementTools -Restart
+
+
 
 
 #### DHCP ####
@@ -94,7 +96,6 @@ Add-DhcpServerv4Scope -StartRange $StartRange -EndRange $EndRange -Name 'Scope1'
 Set-DhcpServerv4OptionValue -DnsServer $DNS_Server
 
 Add-DhcpServerInDC  -DnsName $ComputerName -Confirm
-
 
 
 ### Remove Roles ###
