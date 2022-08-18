@@ -2,8 +2,8 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "DC2"
-$VM_Name                  = "$Project_Name" + "-" + $ComputerName
+$ComputerName             = "Router"
+$VM_Name                  = "$Project_Name" + "-" + "$ComputerName"
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
 $DomainUserName           = "$Net_BIOS_Name\$LocalUserNameSRV"
@@ -43,6 +43,7 @@ Rename-Computer -NewName $ComputerName  -Restart -Force
 Add-Computer -NewName $ComputerName -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
 
 Stop-Computer -Force
+Restart-Computer -Force
 
 Get-TimeZone *egy*
 
@@ -52,19 +53,20 @@ clear ; ipconfig /all
 ipconfig /release ; ipconfig /renew
 Get-NetIPAddress
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "3"
+$InterfaceIndex = "6"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.100 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
 Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
 
 ### List features ###
-Get-WindowsFeature *web* | select name
-Get-WindowsFeature | Where-Object InstallState -EQ installed
+cls ; Get-WindowsFeature *DFS*| Where-Object InstallState -EQ installed | select name
+cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed
 
 
 ### Add Roles ###
@@ -96,7 +98,9 @@ Add-DhcpServerInDC  -DnsName $ComputerName -Confirm
 ### Remove Roles ###
 Remove-WindowsFeature 'AD-Domain-Services' -IncludeManagementTools -Restart
 
-Remove-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment'   -IncludeAllSubFeature -IncludeManagementTools
+Remove-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment' -IncludeAllSubFeature -IncludeManagementTools
+
+cls ; Remove-WindowsFeature 'FS-DFS-Replication' -IncludeManagementTools -Restart
 
 
 
@@ -106,7 +110,7 @@ Restart-Computer -Force
 
 
 ### Promote First Forest ###
-Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -Force
+cls ;Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -Force
 
 Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -InstallDns -Force -Credential $DomainCredential
 
@@ -115,5 +119,5 @@ Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabaseP
 
 
 
-
+dcdiag /test:dns /v /s:itoutbreak.net /DnsBasic
 
