@@ -67,7 +67,7 @@ Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddre
 Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
 
 ### List features ###
-cls ; Get-WindowsFeature *exp* | Where-Object InstallState -NE installed | select Name
+cls ; Get-WindowsFeature | Where-Object InstallState -NE installed | select Name
 cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed
 
@@ -92,9 +92,6 @@ cls ; $Feature = Get-WindowsFeature 'PowerShell-V2'
 if ( $Feature.InstallState -ne 'installed' )
 {Add-WindowsFeature 'PowerShell-V2' -IncludeAllSubFeature -IncludeManagementTools -Restart}
 else {cls ; Write-Host Feature is already installed}
-
-
-
 
 #### DHCP ####
 Add-WindowsFeature 'DHCP'                  -IncludeAllSubFeature -IncludeManagementTools
@@ -121,7 +118,7 @@ cls ; Remove-WindowsFeature 'GPMC'  -IncludeManagementTools -Restart
 cls ; $Features = Get-WindowsFeature ('AD-Domain-Services','FS-DFS-Replication')
 foreach ($Features in $Features){
 if ($Features.InstallState -eq 'installed'){
-Remove-WindowsFeature $Features -IncludeManagementTools -Restart}
+Remove-WindowsFeature $Features -IncludeManagementTools}
 else {cls ; Write-Host Feature is not installed}}
 
 hostname
