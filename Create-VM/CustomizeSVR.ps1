@@ -2,7 +2,7 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "Router"
+$ComputerName             = "WSUS"
 $VM_Name                  = "$Project_Name" + "-" + "$ComputerName"
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -28,6 +28,7 @@ Start-VM -VMName $VM_Name
 
 ### Logon to local machine "Server" ###
 Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialServer 
+Enter-PSSession -VMName "WSUS" -Credential $LocalCredentialServer 
 ### Logon to local machine "Client" ###
 Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialClient
 ### Logon to domain joined machine ###
@@ -39,6 +40,7 @@ cd\ ; Clear ; hostname ; whoami
 
 
 Rename-Computer -NewName $ComputerName  -Restart -Force
+Rename-Computer -NewName WSUS  -Restart -Force
 
 Add-Computer -NewName $ComputerName -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
 
@@ -53,10 +55,10 @@ clear ; ipconfig /all
 ipconfig /release ; ipconfig /renew
 Get-NetIPAddress
 Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "6"
+$InterfaceIndex = "3"
 Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
+New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 192.168.1.71 -PrefixLength 8
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.100 -PrefixLength 8
@@ -65,13 +67,13 @@ Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddre
 Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
 
 ### List features ###
-cls ; Get-WindowsFeature *remote* | Where-Object InstallState -NE installed | select Name
+cls ; Get-WindowsFeature *exp* | Where-Object InstallState -NE installed | select Name
 cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed
 
 
 ### Add Roles ###
-Add-WindowsFeature 'AD-Domain-Services'    -IncludeAllSubFeature -IncludeManagementTools
+cls ; Add-WindowsFeature 'AD-Domain-Services','FS-DFS-Replication' -IncludeAllSubFeature -IncludeManagementTools -Restart
 
 Add-WindowsFeature 'AD-Certificate'        -IncludeAllSubFeature -IncludeManagementTools
 
@@ -79,11 +81,17 @@ Add-WindowsFeature 'ADCS-Cert-Authority'   -IncludeAllSubFeature -IncludeManagem
 
 Add-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment'   -IncludeAllSubFeature -IncludeManagementTools
 
-Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagementTools
+Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagementTools -Restart
 
 Add-WindowsFeature 'Web-Server' -IncludeAllSubFeature -IncludeManagementTools
 
 cls ; Add-WindowsFeature 'RemoteAccess' -IncludeAllSubFeature -IncludeManagementTools -Restart
+
+
+cls ; $Feature = Get-WindowsFeature 'PowerShell-V2'
+if ( $Feature.InstallState -ne 'installed' )
+{Add-WindowsFeature 'PowerShell-V2' -IncludeAllSubFeature -IncludeManagementTools -Restart}
+else {cls ; Write-Host Feature is already installed}
 
 
 
@@ -110,6 +118,11 @@ cls ; Remove-WindowsFeature 'Web-Server'  -IncludeManagementTools -Restart
 cls ; Remove-WindowsFeature 'GPMC'  -IncludeManagementTools -Restart
 
 
+cls ; $Features = Get-WindowsFeature ('AD-Domain-Services','FS-DFS-Replication')
+foreach ($Features in $Features){
+if ($Features.InstallState -eq 'installed'){
+Remove-WindowsFeature $Features -IncludeManagementTools -Restart}
+else {cls ; Write-Host Feature is not installed}}
 
 hostname
 
