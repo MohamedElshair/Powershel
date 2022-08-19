@@ -5,9 +5,7 @@
 #389 --> LDAP
 cls
 foreach ($Ports in $Ports)
-{
-Test-NetConnection "WIN-BH74LPDB544" -Port $Ports
-}
+{Test-NetConnection "DC2" -Port $Ports}
 
 
 
