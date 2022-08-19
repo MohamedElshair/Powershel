@@ -2,7 +2,7 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "WSUS"
+$ComputerName             = "DC1"
 $VM_Name                  = "$Project_Name" + "-" + "$ComputerName"
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -28,7 +28,7 @@ Start-VM -VMName $VM_Name
 
 ### Logon to local machine "Server" ###
 Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialServer 
-Enter-PSSession -VMName "WSUS" -Credential $LocalCredentialServer 
+Enter-PSSession -VMName "REAL22-ROUTER" -Credential $LocalCredentialServer 
 ### Logon to local machine "Client" ###
 Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialClient
 ### Logon to domain joined machine ###
@@ -49,22 +49,30 @@ Restart-Computer -Force
 
 Get-TimeZone *egy*
 
-Set-TimeZone -Id "Egypt Standard Time"
+cls ; Set-TimeZone -Id "Egypt Standard Time" ; Get-TimeZone
 
-clear ; ipconfig /all
-ipconfig /release ; ipconfig /renew
+cls ; ipconfig /all
+
 Get-NetIPAddress
-Get-NetIPInterface  -AddressFamily IPv4
-$InterfaceIndex = "3"
-Get-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
+
+Get-NetAdapter
+$InterfaceIndex = "7"
+Get-NetAdapter -Name 'Ethernet 2' | Rename-NetAdapter -NewName External
+
+cls ; Get-NetIPInterface  -AddressFamily IPv4
+Get-NetIPInterface -InterfaceIndex 6 -AddressFamily IPv4
+
+cls ; Get-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
+
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 192.168.1.71 -PrefixLength 8
-New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
+cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.1 -PrefixLength 8 ; cls ; ipconfig /all
+cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8 ; cls ; ipconfig /all
+cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8 ; cls ; ipconfig /all
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.100 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
-Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex
+cls ; Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex ; cls ; ipconfig /all
 
 ### List features ###
 cls ; Get-WindowsFeature | Where-Object InstallState -NE installed | select Name
@@ -73,29 +81,17 @@ cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed
 
 
 ### Add Roles ###
-cls ; Add-WindowsFeature 'AD-Domain-Services','FS-DFS-Replication' -IncludeAllSubFeature -IncludeManagementTools -Restart
+# 'AD-Domain-Services','FS-DFS-Replication'
+# 'AD-Certificate','ADCS-Cert-Authority','ADCS-Web-Enrollment'
+# 'Windows-Server-Backup','Web-Server','RemoteAccess','DHCP'
 
-Add-WindowsFeature 'AD-Certificate'        -IncludeAllSubFeature -IncludeManagementTools
-
-Add-WindowsFeature 'ADCS-Cert-Authority'   -IncludeAllSubFeature -IncludeManagementTools
-
-Add-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment'   -IncludeAllSubFeature -IncludeManagementTools
-
-Add-WindowsFeature 'Windows-Server-Backup' -IncludeAllSubFeature -IncludeManagementTools -Restart
-
-Add-WindowsFeature 'Web-Server' -IncludeAllSubFeature -IncludeManagementTools
-
-cls ; Add-WindowsFeature 'RemoteAccess' -IncludeAllSubFeature -IncludeManagementTools -Restart
-
-
-cls ; $Feature = Get-WindowsFeature 'PowerShell-V2'
-if ( $Feature.InstallState -ne 'installed' )
-{Add-WindowsFeature 'PowerShell-V2' -IncludeAllSubFeature -IncludeManagementTools -Restart}
-else {cls ; Write-Host Feature is already installed}
+cls ; $Features = Get-WindowsFeature ('DHCP')
+foreach ($Features in $Features){
+if ($Features.InstallState -ne 'installed'){
+Install-WindowsFeature $Features -IncludeAllSubFeature -IncludeManagementTools}
+else {cls ; Write-Host Feature is already installed}}
 
 #### DHCP ####
-Add-WindowsFeature 'DHCP'                  -IncludeAllSubFeature -IncludeManagementTools
-
 Add-DhcpServerv4Scope -StartRange $StartRange -EndRange $EndRange -Name 'Scope1' -State Active -Type Both  -SubnetMask '255.0.0.0' 
 
 Set-DhcpServerv4OptionValue -DnsServer $DNS_Server
@@ -104,18 +100,8 @@ Add-DhcpServerInDC  -DnsName $ComputerName -Confirm
 
 
 ### Remove Roles ###
-Remove-WindowsFeature 'AD-Domain-Services' -IncludeManagementTools -Restart
 
-Remove-WindowsFeature 'ADCS-Cert-Authority','ADCS-Web-Enrollment' -IncludeAllSubFeature -IncludeManagementTools
-
-cls ; Remove-WindowsFeature 'FS-DFS-Replication' -IncludeManagementTools -Restart
-
-cls ; Remove-WindowsFeature 'Web-Server'  -IncludeManagementTools -Restart
-
-cls ; Remove-WindowsFeature 'GPMC'  -IncludeManagementTools -Restart
-
-
-cls ; $Features = Get-WindowsFeature ('AD-Domain-Services','FS-DFS-Replication')
+cls ; $Features = Get-WindowsFeature ('AD-Domain-Services','FS-DFS-Replication','GPMC')
 foreach ($Features in $Features){
 if ($Features.InstallState -eq 'installed'){
 Remove-WindowsFeature $Features -IncludeManagementTools}
@@ -132,6 +118,7 @@ cls ;Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Na
 Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -InstallDns -Force -Credential $DomainCredential
 
 
+Add-Computer -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
 
 
 
