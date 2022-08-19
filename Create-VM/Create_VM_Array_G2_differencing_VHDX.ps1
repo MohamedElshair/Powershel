@@ -1,13 +1,13 @@
 ﻿################## Create Variables    #################################
-$VM_Name_Array = ("DC1","DC2","DC3")
+$VM_Name_Array = ("ROUTER")
 
 
 foreach ( $VM_Name_Array in $VM_Name_Array ) 
 {
 
-$Project_Name = "SAID"
+$Project_Name = "REAL22"
 
-$Drive_Letter_collon = "E:\"
+$Drive_Letter_collon = "c:\"
 
 $Project_Path = ("$Drive_Letter_collon" + "$Project_Name")
 
@@ -58,7 +58,7 @@ Write-Host "We found that your VM is already created before"
 
 
 
-$ParentPath = "E:\Main Hard Drive\WINSVR2022-July2022.vhdx"
+$ParentPath = "c:\Main Hard Drives\WIN_SVR22_CORE_SYSPREP_Aug22.vhdx"
 $Test_VHD_Path = Test-Path $VHD_Path
 $Test_ParentVHD_Path = Test-Path $ParentPath
 if ( $Test_ParentVHD_Path.Equals($false))
