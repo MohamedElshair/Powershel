@@ -27,6 +27,7 @@ Write-Host "We found that your VHD is already created before"
 
 ### Attach ISO ###
 
+cls
 $ISO_folder = Read-Host "Please enter the iso file folder path"
 $ISO = Get-ChildItem $ISO_folder\*.iso
 Remove-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1
@@ -36,6 +37,7 @@ Set-VMDvdDrive -VMName $VM_Full_Name -ControllerNumber 0 -ControllerLocation 1 -
 
 
 ### Boot Order DVD first ###
+cls
 $vmDVD=Get-VMDvdDrive -VMName $VM_Full_Name 
 $vmDrive= Get-VMHardDiskDrive -VMName $VM_Full_Name 
 $vmNIC= Get-VMNetworkAdapter -VMName $VM_Full_Name
