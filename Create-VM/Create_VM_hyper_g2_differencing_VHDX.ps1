@@ -30,6 +30,7 @@ $vmDrive= Get-VMHardDiskDrive -VMName $VM_Full_Name
 $vmNIC= Get-VMNetworkAdapter -VMName $VM_Full_Name
 Set-VMFirmware -VMName $VM_Full_Name -EnableSecureBoot On -BootOrder $vmDrive,$vmDVD,$vmNIC 
 
+Get-VM $VM_Full_Name | select Name,Id
 
 ### Start VM ###
 Start-VM $VM_Full_Name
