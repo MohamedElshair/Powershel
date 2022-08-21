@@ -2,7 +2,7 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "DC1"
+$ComputerName             = "WAC"
 $VM_Name                  = "$Project_Name" + "-" + "$ComputerName"
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -21,14 +21,14 @@ $DNS_Server               = '10.0.0.10'
 hostname ; whoami
 
 
-Get-VM $Project_Name*
+cls ; Get-VM $Project_Name*
 Start-VM -VMName $VM_Name
 
 
 
 ### Logon to local machine "Server" ###
 Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialServer 
-Enter-PSSession -VMName "REAL22-ROUTER" -Credential $LocalCredentialServer 
+Enter-PSSession -VMName "WSUS" -Credential $LocalCredentialServer 
 ### Logon to local machine "Client" ###
 Enter-PSSession -VMName "$VM_Name" -Credential $LocalCredentialClient
 ### Logon to domain joined machine ###
@@ -60,7 +60,7 @@ $InterfaceIndex = "7"
 Get-NetAdapter -Name 'Ethernet 2' | Rename-NetAdapter -NewName External
 
 cls ; Get-NetIPInterface  -AddressFamily IPv4
-Get-NetIPInterface -InterfaceIndex 6 -AddressFamily IPv4
+Get-NetIPInterface -InterfaceIndex 14 -AddressFamily IPv4
 
 cls ; Get-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 
@@ -68,17 +68,19 @@ Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.1 -PrefixLength 8 ; cls ; ipconfig /all
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8 ; cls ; ipconfig /all
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8 ; cls ; ipconfig /all
+cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8 ; cls ; ipconfig /all
+cls ; Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex ; cls ; ipconfig /all
+
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.100 -PrefixLength 8
 Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
 
-cls ; Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex ; cls ; ipconfig /all
+
 
 ### List features ###
 cls ; Get-WindowsFeature | Where-Object InstallState -NE installed | select Name
-cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
-cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed
 
+cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 
 ### Add Roles ###
 # 'AD-Domain-Services','FS-DFS-Replication'
@@ -117,8 +119,7 @@ cls ;Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Na
 
 Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -InstallDns -Force -Credential $DomainCredential
 
-
-Add-Computer -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
+Add-Computer -NewName $ComputerName -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
 
 
 
