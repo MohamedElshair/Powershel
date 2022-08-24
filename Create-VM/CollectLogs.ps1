@@ -31,7 +31,7 @@ $HostName        = hostname
 $getadcomputer   = Get-ADComputer $HostName | select name,ObjectGUID,sid
 $w32tm           = w32tm /query /status
 $Date            = Get-Date -Format 'dd.MMMM.yy   HH.mm.ss'
-$folderFullName  = "MicrosoftLogs" + "   " + "$Date"
+$folderFullName  = "MicrosoftLogs" +"$HostName" + "   " + "$Date"
 New-Item "$folderFullName" -ItemType directory
 cd $folderFullName
 ### Create main folder ###
