@@ -31,7 +31,7 @@ $HostName        = hostname
 $getadcomputer   = Get-ADComputer $HostName | select name,ObjectGUID,sid
 $w32tm           = w32tm /query /status
 $Date            = Get-Date -Format 'dd.MMMM.yy   HH.mm.ss'
-$folderFullName  = "MicrosoftLogs" +"$HostName" + "   " + "$Date"
+$folderFullName  = "MicrosoftLogs" + " - "  + "$HostName" + " - " + "$Date"
 New-Item "$folderFullName" -ItemType directory
 cd $folderFullName
 ### Create main folder ###
@@ -45,7 +45,8 @@ New-Item "$HostName-Services.txt" -ItemType file
 New-Item "$HostName-LOGS" -ItemType Directory
 New-Item "$HostName-Events" -ItemType Directory
 New-Item "$HostName-Replication" -ItemType Directory
-New-Item "$HostName-Replication\$HostName-DFS.txt" -ItemType file
+New-Item "$HostName-DFSR" -ItemType Directory
+New-Item "$HostName-DFSR\$HostName-DFSR.txt" -ItemType file
 New-Item "$HostName-Registery" -ItemType Directory
 ### Create main folders & files ###
 
@@ -108,14 +109,28 @@ dcdiag.exe  /v  > "$HostName-DCDIAG.txt"
 Add-Content "$HostName-MainInfo.txt" $HostName," ",$FSMO," ",$getadcomputer," ",$ADForest," ",$ADDomain," ",$w32tm
 ### Domain function ###
 
-### DFS ###
-$DFSglobalstate      = dfsrmig.exe /getglobalstate
-$DFSmigrationstate   = dfsrmig.exe /getmigrationstate
-Add-Content "$HostName-Replication\$HostName-DFS.txt" "$DFSglobalstate"," ",$DFSmigrationstate
-### DFS ###
+### DFSR ###
+$DFSR_Global_State      = dfsrmig.exe /getglobalstate
+$DFSR_Migration_State   = dfsrmig.exe /getmigrationstate
+$DFSR_State             = Get-WmiObject -Namespace "root\MicrosoftDFS" -Class DfsrReplicatedFolderInfo | Select-Object ReplicatedFolderName,ReplicationGroupName,state 
+
+<#
+The "State" values can be: 
+0 = Uninitialized 
+1 = Initialized 
+2 = Initial Sync 
+3 = Auto Recovery 
+4 = Normal 
+5 = In Error   
+#>
+
+Add-Content "$HostName-DFSR\$HostName-DFSR.txt" "$DFSR_Global_State"," ","$DFSR_Migration_State"," ",$DFSR_State
+### DFSR ###
 
 cd\
 
+Compress-Archive -Path "c:\$folderFullName\" -Verbose  -DestinationPath "c:\$folderFullName.zip" -Force
+Remove-Item -Path "c:\$folderFullName" -Recurse -Force ; cls
 }
 
 Add-Content -Value $content1 -Path C:\CollectLogs.ps1
