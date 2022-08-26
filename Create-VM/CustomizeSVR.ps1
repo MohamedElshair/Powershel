@@ -2,7 +2,7 @@
 $Project_Name             = $Project_Name
 $Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name              = "$Net_BIOS_Name" + "." + "net"
-$ComputerName             = "WAC"
+$ComputerName             = "DC1"
 $VM_Name                  = "$Project_Name" + "-" + "$ComputerName"
 $LocalUserNameSRV         = 'administrator'
 $LocalUserNameCLT         = '.\admin'
@@ -56,7 +56,7 @@ cls ; ipconfig /all
 Get-NetIPAddress
 
 Get-NetAdapter
-$InterfaceIndex = "7"
+$InterfaceIndex = "9"
 Get-NetAdapter -Name 'Ethernet 2' | Rename-NetAdapter -NewName External
 
 cls ; Get-NetIPInterface  -AddressFamily IPv4
@@ -68,7 +68,7 @@ Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.1 -PrefixLength 8 ; cls ; ipconfig /all
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8 ; cls ; ipconfig /all
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8 ; cls ; ipconfig /all
-cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8 ; cls ; ipconfig /all
+cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.40 -PrefixLength 8 ; cls ; ipconfig /all
 cls ; Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $InterfaceIndex ; cls ; ipconfig /all
 
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8
