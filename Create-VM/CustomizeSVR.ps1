@@ -56,16 +56,16 @@ cls ; ipconfig /all
 Get-NetIPAddress
 
 Get-NetAdapter
-$InterfaceIndex = "9"
+$InterfaceIndex = "3"
 Get-NetAdapter -Name 'Ethernet 2' | Rename-NetAdapter -NewName External
 
 cls ; Get-NetIPInterface  -AddressFamily IPv4
-Get-NetIPInterface -InterfaceIndex 14 -AddressFamily IPv4
+Get-NetIPInterface -InterfaceIndex 15 -AddressFamily IPv4
 
 cls ; Get-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
 
 Remove-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
-cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.1 -PrefixLength 8 ; cls ; ipconfig /all
+cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8 ; cls ; ipconfig /all
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8 ; cls ; ipconfig /all
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8 ; cls ; ipconfig /all
 cls ; New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.40 -PrefixLength 8 ; cls ; ipconfig /all
@@ -73,7 +73,7 @@ cls ; Set-DnsClientServerAddress -ServerAddresses $DNS_Server -InterfaceIndex $I
 
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.30 -PrefixLength 8
 New-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.100 -PrefixLength 8
-Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.20 -PrefixLength 8
+Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddress 10.0.0.10 -PrefixLength 8
 
 
 
