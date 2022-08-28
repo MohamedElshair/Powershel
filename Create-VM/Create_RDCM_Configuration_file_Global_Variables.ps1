@@ -1,13 +1,4 @@
-﻿$Project_Name = Read-Host 'Please enter your project name'
-
-$Drive_Letter_No_collon = Read-Host 'Please enter your drive letter'
-
-$Drive_Letter_collon = "$Drive_Letter_No_collon" + ':\'
-
-$Project_Path = ("$Drive_Letter_collon" + "$Project_Name")
-
-
-
+﻿
 $Test_RDG_File = Test-Path "$Project_Path\$Project_Name.rdg"
 If ( $Test_RDG_File.Equals($true))
 {
@@ -65,8 +56,8 @@ $Content = @"
     </properties>
     <logonCredentials inherit="None">
       <profileName scope="Local">Custom</profileName>
-      <userName>,\administrator</userName>
-      <password>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA3SS/P85+nUKGzZWMDzzLoAAAAAACAAAAAAAQZgAAAAEAACAAAAAboJ2wSQ8W32iMQcp6zwGDSkp/M8QjMNB2/el4/plkdwAAAAAOgAAAAAIAACAAAACBIM19nIqmtyuhx3wuAC8HTAUkOK4nvPRIEkXTmYS30SAAAABqnfhPA07IxCCap4kDhvu4tua/gZprhIlu4Cm2mxsHOEAAAACIRigefdbn77g3LGwK5EIqn/y3DYX1UpSXF91Fcpt0npJZgTUbC+z+ahxBzq2WokQPe77oUEYMOZO9rYrGh1fO</password>
+      <userName>.\administrator</userName>
+      <password>P@$$w0rd</password>
       <domain>,</domain>
     </logonCredentials>
     <remoteDesktop inherit="None">
