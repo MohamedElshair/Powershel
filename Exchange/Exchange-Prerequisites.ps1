@@ -39,10 +39,10 @@ cls ; Get-WindowsFeature *bit* | Where-Object InstallState -NE installed
 cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 
 ### Add Roles ###
-# 'NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Client-Auth','Web-Digest-Auth','Web-Dyn-Compression','BITS'
+# Web-WebServer, Web-Common-Http, Web-Default-Doc,Web-Dir-Browsing,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Health,Web-Http-Logging,Web-Log-Libraries ,Web-Request-Monitor,Web-Http-Tracing,Web-Performance, Web-Stat-Compression,Web-Dyn-Compression,Web-Security,Web-Filtering,Web-Basic-Auth,Web-Client-Auth,Web-Digest-Auth, Web-Windows-Auth,Web-App-Dev,Web-Net-Ext45,Web-Asp-Net45 ,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Mgmt-Tools ,Web-Mgmt-Compat ,Web-metabase,Web-WMI, Web-Mgmt-Service, NET-Framework-45-ASPNET, NET-WCF-HTTP-Activation45, NET -WCF -MSMQ-Activation45, NET-WCF-Pipe-Activation45 , NET-WCF-TCP-Activation45, Server-Media-Foundation, MSMQ-Services, MSMQ-Server, RSAT-Feature-Tools, RSAT-Clustering, RSAT-Clustering-PowerShell, RSAT-Clustering-CmdInterface, RPC-over-HTTP-Proxy,WAS-Process-Model ,WAS-Config-APIs
 Get-WindowsFeature *6* | select name
 
-cls ; $Features = Get-WindowsFeature ('NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Client-Auth','Web-Digest-Auth','Web-Dyn-Compression','BITS')
+cls ; $Features = Get-WindowsFeature ( 'Web-WebServer', 'Web-Common-Http','Web-Default-Doc','Web-Dir-Browsing','Web-Http-Errors','Web-Static-Content','Web-Http-Redirect','Web-Health','Web-Http-Logging','Web-Log-Libraries ','Web-Request-Monitor','Web-Http-Tracing','Web-Performance',' Web-Stat-Compression','Web-Dyn-Compression','Web-Security','Web-Filtering','Web-Basic-Auth','Web-Client-Auth','Web-Digest-Auth',' Web-Windows-Auth','Web-App-Dev','Web-Net-Ext45','Web-Asp-Net45 ','Web-ISAPI-Ext','Web-ISAPI-Filter','Web-Mgmt-Tools ','Web-Mgmt-Compat ','Web-metabase','Web-WMI',' Web-Mgmt-Service',' NET-Framework-45-ASPNET',' NET-WCF-HTTP-Activation45',' NET -WCF -MSMQ-Activation45',' NET-WCF-Pipe-Activation45 ',' NET-WCF-TCP-Activation45',' Server-Media-Foundation',' MSMQ-Services',' MSMQ-Server',' RSAT-Feature-Tools',' RSAT-Clustering',' RSAT-Clustering-PowerShell',' RSAT-Clustering-CmdInterface',' RPC-over-HTTP-Proxy','WAS-Process-Model ','WAS-Config-APIs')
 foreach ($Features in $Features){
 if ($Features.InstallState -ne 'installed'){
 Install-WindowsFeature $Features -IncludeAllSubFeature -IncludeManagementTools}
