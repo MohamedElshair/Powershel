@@ -18,6 +18,7 @@ $SysvolPath               = 'c:\windows\SYSVOL'
 $StartRange               = '10.0.0.100' 
 $EndRange                 = '10.0.0.200'
 $DNS_Server               = '10.0.0.10'
+$DC1_IPAddress = ' ' ; $DC1_IPAddress = '10.0.0.10'
 hostname ; whoami
 
 
@@ -55,11 +56,52 @@ cls ; ipconfig /all
 
 Get-NetIPAddress
 
-Get-NetAdapter
-$InterfaceIndex = "3"
-Get-NetAdapter -Name 'Ethernet 2' | Rename-NetAdapter -NewName External
+# Rename local Network Adaptor
+$CSV_Path = ' ' ; $CSV_Path = 'c:\NetAdapter.csv'
+########################
+cls ; Get-NetAdapter| select Name,ifIndex | Export-Csv "$CSV_Path" -Force
+cls ; $NetAdapter = ' '            ; $NetAdapter = Import-Csv "$CSV_Path" ; cls ; $NetAdapter
+cls ; $InterfaceIndexifIndex = ' ' ; $InterfaceIndexifIndex = ($NetAdapter.ifIndex)
+cls ; $InterfaceName = ' '         ; $InterfaceName = ($NetAdapter.Name)
 
-cls ; Get-NetIPInterface  -AddressFamily IPv4
+$line = " "
+foreach ( $Line in $InterfaceName ) {Get-NetIPInterface "$Line" -AddressFamily IPv4}
+
+cls ; Get-NetAdapter -Name "$InterfaceName" | Rename-NetAdapter -NewName "$Domain_Name"
+
+# Rename external Network Adaptor
+########################
+cls ; Get-NetAdapter| select Name,ifIndex | Export-Csv c:\NetAdapter.csv -Force
+cls ; $NetAdapter = ' '            ; $NetAdapter = Import-Csv C:\NetAdapter.csv ; cls ; $NetAdapter
+$ExternalNIC = Read-Host 'Enter your external NIC index number'
+
+cls ; Get-NetAdapter -Name 'Ethernet' | Rename-NetAdapter -NewName 'External'
+cls ; Get-NetIPInterface "$InterfaceName" -AddressFamily IPv4
+
+## Set DC1 internal IP Address configuration
+#####################==============
+cls ; New-NetIPAddress -AddressFamily 'IPv4' -InterfaceIndex "$InterfaceIndexifIndex" -IPAddress "$DC1_IPAddress" -PrefixLength '8'
+
+cls ; Set-DnsClientServerAddress -ServerAddresses "$DNS_Server"     -InterfaceIndex "$InterfaceIndex"
+
+cls ; Get-NetIPAddress -AddressFamily 'IPv4' -InterfaceIndex "$InterfaceIndexifIndex" | select IPAddress | ft -AutoSize
+Get-DnsClientServerAddress -InterfaceIndex "$InterfaceIndex" -AddressFamily 'IPv4' 
+
+cls ; Remove-Item 'C:\NetAdapter.csv' -Force
+
+## Set DC1 external IP Address configuration
+#####################==============
+cls ; New-NetIPAddress -AddressFamily 'IPv4' -InterfaceIndex "$ExternalNIC" -IPAddress "$DC1_IPAddress" -PrefixLength '8'
+
+cls ; Set-DnsClientServerAddress -ServerAddresses "$DNS_Server"     -InterfaceIndex "$InterfaceIndex"
+
+cls ; Get-NetIPAddress -AddressFamily 'IPv4' -InterfaceIndex "$InterfaceIndexifIndex" | select IPAddress | ft -AutoSize
+Get-DnsClientServerAddress -InterfaceIndex "$InterfaceIndex" -AddressFamily 'IPv4' 
+
+cls ; Remove-Item 'C:\NetAdapter.csv' -Force
+
+####################################################################################################################################
+
 Get-NetIPInterface -InterfaceIndex 15 -AddressFamily IPv4
 
 cls ; Get-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex
@@ -87,18 +129,24 @@ cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 # 'AD-Certificate','ADCS-Cert-Authority','ADCS-Web-Enrollment'
 # 'Windows-Server-Backup','Web-Server','RemoteAccess','DHCP'
 
-cls ; $Features = Get-WindowsFeature ('DHCP')
-foreach ($Features in $Features){
-if ($Features.InstallState -ne 'installed'){
-Install-WindowsFeature $Features -IncludeAllSubFeature -IncludeManagementTools}
+cls ; $Features = ' ' ; $Features = Get-WindowsFeature ('AD-Domain-Services','FS-DFS-Replication')
+cls ; $Features = ' ' ; $Features = Get-WindowsFeature ('Windows-Server-Backup')
+cls ; $Features = ' ' ; $Features = Get-WindowsFeature ('DHCP')
+
+$Features.InstallState -eq 'installed'
+
+foreach ($Feature in $Features){
+if ($Feature.InstallState -ne 'installed'){
+Install-WindowsFeature "$Feature" -IncludeAllSubFeature -IncludeManagementTools}
 else {cls ; Write-Host Feature is already installed}}
+
 
 #### DHCP ####
 Add-DhcpServerv4Scope -StartRange $StartRange -EndRange $EndRange -Name 'Scope1' -State Active -Type Both  -SubnetMask '255.0.0.0' 
 
 Set-DhcpServerv4OptionValue -DnsServer $DNS_Server
 
-Add-DhcpServerInDC  -DnsName $ComputerName -Confirm
+Add-DhcpServerInDC -DnsName $ComputerName -Confirm
 
 
 ### Remove Roles ###
@@ -120,6 +168,7 @@ cls ;Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Na
 Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -InstallDns -Force -Credential $DomainCredential
 
 Add-Computer -NewName $ComputerName -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
+Add-Computer -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
 
 
 
