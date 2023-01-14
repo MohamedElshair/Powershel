@@ -20,9 +20,12 @@ $content2={### Publish the Root CA Certificate and CRL
 certutil -f -dspublish "A:\CA01_Fabrikam Root CA.crt" RootCA
 certutil -f -dspublish "A:\Fabrikam Root CA.crl" RootCA
 
+
+
 ### To add  Root CA Certificate and CRL in local store
 certutil -addstore -f root "CA01_Itoutbreak Root CA.crt"
 certutil -addstore -f root "Itoutbreak Root CA.crl"
+
 
 
 ### Perform Post Installation Configuration Tasks on the Subordinate Issuing CA
@@ -36,6 +39,7 @@ Certutil -setreg CA\CRLOverlapPeriodUnits 12
 Certutil -setreg CA\CRLOverlapPeriod "Hours"
 
 Certutil -setreg CA\ValidityPeriodUnits 5
-Certutil -setreg CA\ValidityPeriod "Years"}
+Certutil -setreg CA\ValidityPeriod "Years"
+}
 
 Add-Content -Value $content2 C:\Script.ps1 -Force
