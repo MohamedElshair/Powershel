@@ -1,12 +1,13 @@
 ﻿################## Create Variables    #################################
-$VM_Name_Array = ("DC1","DC2","DC3","Router","WSUS")
 
 
-foreach ( $VM_Name_Array in $VM_Name_Array ) 
-{
+$VM_Name_Array = 'DC1','CM01','CM02','Router','CLT01','CLT02'
 
-$Project_Name = "REAL22"
-$Drive_Letter_collon = "E:\"
+
+Clear-Host ; foreach ( $VM_Name_Array in $VM_Name_Array ) {
+
+$Project_Name = "SCCM"
+$Drive_Letter_collon = "D:\"
 $Project_Path = ("$Drive_Letter_collon" + "$Project_Name")
 $VM_Full_Name = "$Project_Name" + "-" + "$VM_Name_Array"
 $VM_Path = ("$Project_Path" + "\" + "$VM_Full_Name")
@@ -29,7 +30,7 @@ elseif ($Test_Project_Path.Equals($true))
 {Write-Host "We found that Project Folder is already created before, You can find it under this path $Project_Path"}
 
 #################################################################################################################################
-$VHDX_Copy_From_Path = Read-Host "Please the VHDx path"
+$VHDX_Copy_From_Path = Read-Host Please enter the $VM_Name_Array VHDx path
 $VHDX_Copy_To_Path   = $VM_Path
 
 $Test_VM_Path   = Test-Path -Path $VM_Path
@@ -44,11 +45,18 @@ Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $VM_Full_Nam
 Disable-VMIntegrationService -Name "Time Synchronization" -VMName $VM_Full_Name
 }
 else 
-{Write-Host "We found that your VM is already created before"}
+{New-VM -Name "$VM_Full_Name" -Generation 2 -MemoryStartupBytes 2GB  -NoVHD -Path "$Project_Path" -SwitchName "$Project_Name"
+Import-Module BitsTransfer
+Start-BitsTransfer -Source $VHDX_Copy_From_Path -Destination $VM_Path\$VM_Full_Name.vhdx -Description "Copy VHDX file" -DisplayName "Copy VHDX file"
+Add-VMHardDiskDrive -VMName "$VM_Full_Name" -Path $VM_Path\$VM_Full_Name.vhdx -ControllerType SCSI -ControllerNumber 0 -ControllerLocation 1
+Set-VM -Name $VM_Full_Name -AutomaticCheckpointsEnabled 0 -DynamicMemory -CheckpointType Standard -MemoryMaximumBytes (2GB) -MemoryMinimumBytes (1GB) -MemoryStartupBytes (2GB)
+Enable-VMIntegrationService -Name "Guest Service Interface" -VMName $VM_Full_Name
+Disable-VMIntegrationService -Name "Time Synchronization" -VMName $VM_Full_Name}
 
 Set-VMFirmware -VMName $VM_Full_Name -BootOrder $vmDrive
 Start-VM $VM_Full_Name
 }
+
 
 
 
