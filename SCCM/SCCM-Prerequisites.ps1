@@ -39,11 +39,10 @@ Clear-Host ; Get-WindowsFeature *bit* | Where-Object InstallState -NE installed
 Clear-Host ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 
 ### Add Roles ###
-# 'NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Client-Auth','Web-Digest-Auth','Web-Dyn-Compression','BITS'
-Get-WindowsFeature *6* | select name
+# 'NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Client-Auth','Web-Digest-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Dyn-Compression','BITS'
 
-Clear-Host ; $Features = Get-WindowsFeature ('NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Client-Auth','Web-Digest-Auth','Web-Dyn-Compression','BITS')
 
+Clear-Host ; $Features = Get-WindowsFeature ('NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Client-Auth','Web-Digest-Auth','Web-Dyn-Compression','BITS','Web-Mgmt-Service','Web-Scripting-Tools','Web-WMI','Web-Lgcy-Mgmt-Console','Web-Lgcy-Scripting')
 
 foreach ($Feature in $Features){
 if ($Feature.InstallState -ne 'installed'){
