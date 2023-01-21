@@ -2,7 +2,7 @@
 [string]$Project_Name             = $Project_Name
 [string]$Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name                      = "$Net_BIOS_Name" + "." + "net"
-[string]$ComputerName             = 'ROOTCA'
+[string]$ComputerName             = 'CM01'
 $VM_Name                          = "$Project_Name" + "-" + "$ComputerName"
 [string]$LocalUserNameSRV         = 'administrator'
 [string]$LocalUserNameCLT         = '.\admin'
@@ -54,6 +54,10 @@ Get-TimeZone *egy*
 
 Clear-Host ; Set-TimeZone -Id "Egypt Standard Time" ; Get-TimeZone
 
+Clear-Host ;  w32tm.exe /?
+w32tm.exe /resync
+w32tm.exe /computer:dc1
+
 Clear-Host ; ipconfig /all
 
 Get-NetIPAddress
@@ -74,11 +78,12 @@ Clear-Host ; Get-NetAdapter -Name "$InterfaceName" | Rename-NetAdapter -NewName 
 # Rename external Network Adaptor
 ########################
 Clear-Host ; Get-NetAdapter| select Name,ifIndex | Export-Csv c:\NetAdapter.csv -Force
-Clear-Host ; $NetAdapter = ' '            ; $NetAdapter = Import-Csv C:\NetAdapter.csv ; Clear-Host ; $NetAdapter
+Clear-Host ; $NetAdapter = ' '  ; $NetAdapter = Import-Csv C:\NetAdapter.csv ; $NetAdapter
+
 $ExternalNIC = Read-Host 'Enter your external NIC index number'
 
-Clear-Host ; Get-NetAdapter -Name 'Ethernet' | Rename-NetAdapter -NewName 'External'
-Clear-Host ; Get-NetIPInterface "$InterfaceName" -AddressFamily IPv4
+Get-NetAdapter -Name 'Ethernet' | Rename-NetAdapter -NewName 'External'
+Get-NetIPInterface "$InterfaceName" -AddressFamily IPv4
 
 ## Set DC1 internal IP Address configuration
 #####################==============
@@ -133,12 +138,12 @@ Set-NetIPAddress    -AddressFamily IPv4 -InterfaceIndex $InterfaceIndex -IPAddre
 
 
 
-### List features ###
+# List features
 Clear-Host ; Get-WindowsFeature | Where-Object InstallState -NE installed | select Name
 
 Clear-Host ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 
-### Add Roles ###
+# Add Roles
 # 'AD-Domain-Services','FS-DFS-Replication'
 # 'AD-Certificate','ADCS-Cert-Authority','ADCS-Web-Enrollment'
 # 'Windows-Server-Backup','Web-Server','RemoteAccess','DHCP'
@@ -149,15 +154,10 @@ Clear-Host ; $Features = ' ' ; $Features = Get-WindowsFeature 'DHCP'
 Clear-Host ; $Features = ' ' ; $Features = Get-WindowsFeature 'DHCP','Windows-Server-Backup'
 Clear-Host ; $Features = ' ' ; $Features = Get-WindowsFeature 'AD-Certificate','ADCS-Cert-Authority'
 
-$Features.InstallState -eq 'installed'
-
 foreach ($Feature in $Features){
 if ($Feature.InstallState -ne 'installed'){
 Install-WindowsFeature -Name $Feature -IncludeAllSubFeature -IncludeManagementTools}
 else {Clear-Host ; Write-Host Feature is already installed}}
-
-
-
 
 #### DHCP ####
 Add-DhcpServerv4Scope -StartRange $StartRange -EndRange $EndRange -Name 'Scope1' -State Active -Type Both  -SubnetMask '255.0.0.0' 
@@ -166,10 +166,10 @@ Set-DhcpServerv4OptionValue -DnsServer $DNS_Server
 
 Add-DhcpServerInDC -DnsName $ComputerName -Confirm
 
-
 ### Remove Roles ###
 
 Clear-Host ; $Features = Get-WindowsFeature ('AD-Domain-Services','FS-DFS-Replication','GPMC')
+
 foreach ($Features in $Features){
 if ($Features.InstallState -eq 'installed'){
 Remove-WindowsFeature $Features -IncludeManagementTools}
@@ -180,13 +180,16 @@ hostname
 Restart-Computer -Force
 
 
-### Promote First Forest ###
+#Promote First Forest
 Clear-Host ;Install-ADDSForest -DomainName $Domain_Name -DomainNetbiosName $Net_BIOS_Name -ForestMode WinThreshold -DomainMode WinThreshold -InstallDns -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -Force
 
+#Promote Additional DC
 Install-ADDSDomainController -DomainName $Net_BIOS_Name -DatabasePath $DatabasePath -LogPath $LogPath -SysvolPath $SysvolPath -SafeModeAdministratorPassword $Password -InstallDns -Force -Credential $DomainCredential
 
+# Add acomputer to domain
 Add-Computer -NewName $ComputerName -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
-Add-Computer -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
+
+
 
 
 
