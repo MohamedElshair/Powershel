@@ -32,29 +32,31 @@ Enter-PSSession -VMName "$VM_Name" -Credential $DomainCredential
 cd\ ; Clear ; hostname ; whoami
 
 ### List features ###
-cls ; Get-WindowsFeature | Where-Object InstallState -NE installed | select Name
+Clear-Host ; Get-WindowsFeature | Where-Object InstallState -NE installed | select Name
 
-cls ; Get-WindowsFeature *bit* | Where-Object InstallState -NE installed
+Clear-Host ; Get-WindowsFeature *bit* | Where-Object InstallState -NE installed
 
-cls ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
+Clear-Host ; Get-WindowsFeature | Where-Object InstallState -EQ installed | select name
 
 ### Add Roles ###
 # 'NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Client-Auth','Web-Digest-Auth','Web-Dyn-Compression','BITS'
 Get-WindowsFeature *6* | select name
 
-cls ; $Features = Get-WindowsFeature ('NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Client-Auth','Web-Digest-Auth','Web-Dyn-Compression','BITS')
-foreach ($Features in $Features){
-if ($Features.InstallState -ne 'installed'){
-Install-WindowsFeature $Features -IncludeAllSubFeature -IncludeManagementTools}
-else {cls ; Write-Host Feature is already installed}}
+Clear-Host ; $Features = Get-WindowsFeature ('NET-WCF*','rdc','Web-Url-Auth','Web-Windows-Auth','Web-Basic-Auth','Web-Mgmt-Compat','Web-IP-Security','Web-Client-Auth','Web-Digest-Auth','Web-Dyn-Compression','BITS')
+
+
+foreach ($Feature in $Features){
+if ($Feature.InstallState -ne 'installed'){
+Install-WindowsFeature -Name $Feature -IncludeAllSubFeature -IncludeManagementTools}
+else {Clear-Host ; Write-Host Feature is already installed}}
 
 ### Remove Roles ###
 
-cls ; $Features = Get-WindowsFeature ('AD-Domain-Services','FS-DFS-Replication','GPMC')
+Clear-Host ; $Features = Get-WindowsFeature ('AD-Domain-Services','FS-DFS-Replication','GPMC')
 foreach ($Features in $Features){
 if ($Features.InstallState -eq 'installed'){
 Remove-WindowsFeature $Features -IncludeManagementTools}
-else {cls ; Write-Host Feature is not installed}}
+else {Clear-Host ; Write-Host Feature is not installed}}
 
 hostname
 
@@ -63,14 +65,14 @@ Restart-Computer -Force
 
 
 
-cls ; Get-NetFirewallRule -DisplayName *file*  | Enable-NetFirewallRule
-cls ; Get-NetFirewallRule -DisplayName *Instrumentation*   | Enable-NetFirewallRule
+Clear-Host ; Get-NetFirewallRule -DisplayName *file*  | Enable-NetFirewallRule
+Clear-Host ; Get-NetFirewallRule -DisplayName *Instrumentation*   | Enable-NetFirewallRule
 
 Get-NetFirewallRule
 
 # On SCCM server
 
-$SCCMRemoteControl = Get-NetFirewallRule -Name 'SCCM Remote Control' ; cls
+$SCCMRemoteControl = Get-NetFirewallRule -Name 'SCCM Remote Control' ; Clear-Host
 
 if ( $SCCMRemoteControl.Enabled -eq 'true' )
 {Remove-NetFirewallRule -Name 'SCCM Remote Control'} else
@@ -86,10 +88,10 @@ exit
 Enter-PSSession -VMName "SCCM-DC1" -Credential $DomainCredential
 cd\ ; Clear ; hostname ; whoami
 
-cls ; Get-NetFirewallRule -DisplayName *file*  | Enable-NetFirewallRule
-cls ; Get-NetFirewallRule -DisplayName *Instrumentation*   | Enable-NetFirewallRule
+Clear-Host ; Get-NetFirewallRule -DisplayName *file*  | Enable-NetFirewallRule
+Clear-Host ; Get-NetFirewallRule -DisplayName *Instrumentation*   | Enable-NetFirewallRule
 
-$SCCMClientNotification = Get-NetFirewallRule -Name 'SCCM Client Notification' ; cls
+$SCCMClientNotification = Get-NetFirewallRule -Name 'SCCM Client Notification' ; Clear-Host
 
 if ( $SCCMClientNotification.Enabled -eq 'true' )
 {Remove-NetFirewallRule -Name '$SCCMClientNotification'} else
