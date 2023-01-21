@@ -2,7 +2,7 @@
 [string]$Project_Name             = $Project_Name
 [string]$Net_BIOS_Name            = 'Itoutbreak'
 $Domain_Name                      = "$Net_BIOS_Name" + "." + "net"
-[string]$ComputerName             = 'CM01'
+[string]$ComputerName             = 'CLT02'
 $VM_Name                          = "$Project_Name" + "-" + "$ComputerName"
 [string]$LocalUserNameSRV         = 'administrator'
 [string]$LocalUserNameCLT         = '.\admin'
@@ -31,8 +31,10 @@ Start-VM -VMName $VM_Name
 ### Logon to local machine "Server" ###
 Enter-PSSession -VMName $VM_Name -Credential $LocalCredentialServer 
 Enter-PSSession -VMName WSUS     -Credential $LocalCredentialServer 
+
 ### Logon to local machine "Client" ###
 Enter-PSSession -VMName $VM_Name -Credential $LocalCredentialClient
+
 ### Logon to domain joined machine ###
 Enter-PSSession -VMName $VM_Name -Credential $DomainCredential
 
@@ -46,13 +48,14 @@ Rename-Computer -NewName $ComputerName  -Restart -Force
 Rename-Computer -NewName WSUS  -Restart -Force
 
 Add-Computer -NewName $ComputerName -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
+Add-Computer -DomainName $Domain_Name -Credential $DomainCredential -Restart -Force
 
 Stop-Computer -Force
 Restart-Computer -Force
 
 Get-TimeZone *egy*
 
-Clear-Host ; Set-TimeZone -Id "Egypt Standard Time" ; Get-TimeZone
+Clear-Host ; Set-TimeZone -Id "Egypt Standard Time" ; Get-TimeZone ; Restart-Service W32Time
 
 Clear-Host ;  w32tm.exe /?
 w32tm.exe /resync
