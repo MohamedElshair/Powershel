@@ -10,7 +10,7 @@ $Global:VM_Full_Name        = "$Global:Project_Name" + "-" + "$Global:VM_Name"
 $Global:VM_Path             = ("$Global:Project_Path" + "\" + "$Global:VM_Full_Name")
 $Test_Drive                 = Test-path $Global:Drive_Letter_collon
 $global:VHD_Path            = ("$Global:VM_Path" + "\" + "$Global:VM_Full_Name.vhd")
-$global:VHDx_Path            = ("$Global:VM_Path" + "\" + "$Global:VM_Full_Name.vhdx")
+$global:VHDx_Path           = ("$Global:VM_Path" + "\" + "$Global:VM_Full_Name.vhdx")
 
 Clear-Host
 
